@@ -1,0 +1,3030 @@
+<!doctype html>
+<html lang="ko"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Class Eval Studio — 고등학교 인공지능 기초 수업 평가 워크스페이스</title>
+    <meta name="description" content="고등학교 인공지능 기초 수업의 수행평가, 자기·동료평가, 산출물 및 참여도를 통합 관리하고 피드백과 생활기록부 세특 초안을 작성하는 단일 HTML 교사용 평가 워크스페이스">
+    <meta property="og:title" content="AI-Class Eval Studio">
+    <meta property="og:description" content="고등학교 인공지능 기초 수업의 수행평가, 자기·동료평가, 산출물 및 참여도를 통합 관리하는 단일 HTML 교사용 평가 워크스페이스">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Noto+Sans+KR:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-muted: #f1f5f9;
+        --surface-hover: #f8fafc;
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --text: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --primary: #1d4ed8;
+        --primary-hover: #1e40af;
+        --primary-soft: #eff6ff;
+        --primary-border: #bfdbfe;
+        --emerald: #047857;
+        --emerald-soft: #ecfdf5;
+        --emerald-border: #a7f3d0;
+        --amber: #b45309;
+        --amber-soft: #fffbeb;
+        --danger: #dc2626;
+        --danger-soft: #fef2f2;
+        --danger-border: #fecaca;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+        --shadow-lg: 0 20px 45px rgba(15, 23, 42, 0.14);
+      }
+
+      html.dark {
+        --bg: #020617;
+        --surface: #0f172a;
+        --surface-muted: #1e293b;
+        --surface-hover: #172033;
+        --border: #1e293b;
+        --border-strong: #334155;
+        --text: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --primary: #2563eb;
+        --primary-hover: #3b82f6;
+        --primary-soft: rgba(30, 58, 138, 0.35);
+        --primary-border: #1e40af;
+        --emerald: #34d399;
+        --emerald-soft: rgba(6, 78, 59, 0.35);
+        --emerald-border: #065f46;
+        --amber: #fbbf24;
+        --amber-soft: rgba(120, 53, 15, 0.3);
+        --danger: #f87171;
+        --danger-soft: rgba(127, 29, 29, 0.32);
+        --danger-border: #7f1d1d;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Plus Jakarta Sans', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .mono {
+        font-family: 'IBM Plex Mono', 'Noto Sans KR', monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Top Bar */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .nav-tabs {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        overflow-x: auto;
+      }
+
+      .nav-tab {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 4px 2px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        white-space: nowrap;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      .nav-tab:hover {
+        color: var(--text);
+      }
+
+      .nav-tab.active {
+        color: var(--text);
+        font-weight: 600;
+        border-bottom-color: var(--primary);
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--text-secondary);
+        white-space: nowrap;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+
+      .btn:hover:not(:disabled) {
+        background: var(--surface-muted);
+        color: var(--text);
+      }
+
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #ffffff;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: #ffffff;
+      }
+
+      .btn-danger {
+        background: var(--danger-soft);
+        border-color: var(--danger-border);
+        color: var(--danger);
+      }
+
+      .btn-icon {
+        padding: 7px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-icon:hover:not(:disabled) {
+        background: var(--surface-muted);
+        color: var(--text);
+      }
+
+      /* Layout */
+      .workspace {
+        flex: 1;
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .sidebar {
+        width: 268px;
+        flex-shrink: 0;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .main-content {
+        flex: 1;
+        min-width: 0;
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      /* Sidebar blocks */
+      .side-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .side-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .link-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--primary);
+      }
+
+      .link-btn:hover {
+        text-decoration: underline;
+      }
+
+      .input,
+      .select,
+      .textarea {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 13px;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+      }
+
+      .input:focus,
+      .select:focus,
+      .textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.14);
+      }
+
+      .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .activity-item {
+        width: 100%;
+        text-align: left;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: transparent;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .activity-item:hover {
+        background: var(--surface-muted);
+      }
+
+      .activity-item.selected {
+        background: var(--primary-soft);
+        border-color: var(--primary-border);
+      }
+
+      .activity-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .activity-title {
+        font-size: 12.5px;
+        font-weight: 600;
+        margin-top: 2px;
+        color: var(--text);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .empty-card {
+        max-width: 680px;
+        margin: 32px auto;
+        padding: 44px 32px;
+        text-align: center;
+      }
+
+      .empty-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+      }
+
+      .context-header {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .context-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .context-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 4px 0;
+        letter-spacing: -0.02em;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        position: relative;
+      }
+
+      .search-box svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
+      .search-input {
+        padding: 7px 10px 7px 32px;
+        font-size: 12.5px;
+        width: 210px;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+      }
+
+      .seg-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        background: var(--surface-muted);
+        border-radius: 8px;
+        flex-wrap: wrap;
+      }
+
+      .seg-btn {
+        border: none;
+        background: transparent;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 6px;
+        color: var(--text-muted);
+      }
+
+      .seg-btn.active {
+        background: var(--surface);
+        color: var(--text);
+        font-weight: 600;
+        box-shadow: var(--shadow-sm);
+      }
+
+      /* Table */
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      thead th {
+        background: var(--surface-muted);
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover {
+        background: var(--surface-hover);
+      }
+
+      .num-right {
+        text-align: right;
+      }
+
+      .mini-input {
+        padding: 4px 7px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border-strong);
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .att-btn {
+        padding: 3px 7px;
+        font-size: 11px;
+        font-weight: 500;
+        border-radius: 6px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--text-secondary);
+      }
+
+      .att-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .total-score {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--primary);
+      }
+
+      /* Banners & Notices */
+      .banner {
+        padding: 11px 16px;
+        border-radius: 10px;
+        font-size: 12.5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .banner-error {
+        background: var(--danger-soft);
+        border: 1px solid var(--danger-border);
+        color: var(--danger);
+      }
+
+      .banner-ok {
+        background: var(--emerald-soft);
+        border: 1px solid var(--emerald-border);
+        color: var(--emerald);
+      }
+
+      /* Modals & SlideOver */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(15, 23, 42, 0.52);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      .backdrop.drawer-backdrop {
+        justify-content: flex-end;
+        padding: 0;
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 720px;
+        max-height: 90vh;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .drawer {
+        width: 100%;
+        max-width: 600px;
+        height: 100vh;
+        background: var(--surface);
+        border-left: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .modal-footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        background: var(--surface-muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .rubric-card {
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .level-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .level-btn {
+        padding: 8px 6px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--text-secondary);
+        text-align: center;
+      }
+
+      .level-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #ffffff;
+      }
+
+      .split-ai {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .progress-track {
+        height: 8px;
+        border-radius: 6px;
+        background: var(--surface-muted);
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 6px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 6px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        border: 1px solid var(--primary-border);
+      }
+
+      .tag-ok {
+        background: var(--emerald-soft);
+        color: var(--emerald);
+        border-color: var(--emerald-border);
+      }
+
+      @media (max-width: 960px) {
+        .workspace {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .split-ai,
+        .grid-4 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .split-ai {
+          grid-template-columns: 1fr;
+        }
+        .main-content {
+          padding: 16px;
+        }
+        .topbar {
+          padding: 10px 14px;
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .grid-2,
+        .grid-4,
+        .level-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  <script src="/_aistudio-iframe.js?v=29045eb3"></script><script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.0.4"></script><style>.aistudio-hover-highlight { box-shadow: inset 0 0 0 0.5px white, inset 0 0 0 1.5px rgba(128,128,128,0.6) !important; }.aistudio-active-highlight { outline: 2px solid #87a9ff !important; outline-offset: -2px !important; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(0,0,0,0.3) !important; }.aistudio-generating-blur { filter: blur(5px) grayscale(100%) brightness(28%) !important; transition: filter 0.3s ease; }#aistudio-focus-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: #87a9ff; border-radius: 12px; z-index: 10000; padding: 8px; color: #32302c; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }#aistudio-hover-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: rgba(128,128,128,0.6); border-radius: 12px; z-index: 10000; padding: 8px; color: white; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }.aistudio-img-icon { display: none; vertical-align: middle; pointer-events: auto; cursor: pointer; }.aistudio-img-icon.visible { display: inline-flex; }#aistudio-focus-mode-tag .aistudio-img-icon { position: relative; width: 26px; height: 26px; background: #32302c; border-radius: 6px; margin: -4px -4px -4px 0; }#aistudio-focus-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-hover-mode-tag .aistudio-img-icon { position: relative; width: 18px; height: 18px; margin-left: 4px; }#aistudio-hover-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-focus-mode-tag .aistudio-img-icon:hover, #aistudio-hover-mode-tag .aistudio-img-icon:hover { background: #424242 !important; }#aistudio-focus-mode-tag .aistudio-img-icon:active, #aistudio-hover-mode-tag .aistudio-img-icon:active { background: #393f51 !important; }</style></head>
+  <body>
+    <div id="app"></div>
+
+    <script>
+      (function () {
+        // Capture clean single-file HTML snapshot before dynamic rendering for file:// & offline export
+        var PRISTINE_SOURCE_HTML = '<!doctype html>\n' + document.documentElement.outerHTML;
+
+        var STORAGE_KEY = 'ai_class_eval_studio_v1';
+
+        var CURRICULUM_DOMAINS = [
+          {
+            code: '1',
+            title: '인공지능의 이해',
+            summary: '인공지능의 개념, 발전 과정, 지능 에이전트의 탐색과 합리적 판단 원리',
+            standards: [
+              { code: '[12인기01-01]', text: '인공지능의 개념과 발전 과정을 이해하고, 인간 지능과 인공지능의 차이를 설명한다.' },
+              { code: '[12인기01-02]', text: '지능 에이전트의 개념과 역할을 이해하고, 문제 해결을 위한 합리적 행동 원리를 탐색한다.' },
+            ],
+            defaultRubrics: [
+              {
+                title: 'AI 개념 및 원리 설명',
+                weight: 40,
+                levels: {
+                  excellent: '인공지능과 인간 지능의 차이를 구체적 사례로 정확히 설명함',
+                  good: '인공지능의 개념과 원리를 사례와 함께 적절히 설명함',
+                  fair: '인공지능의 기본 개념을 설명하나 사례 연계가 일부 부족함',
+                  needsWork: '인공지능 개념 이해에 기초적인 보충 설명이 필요함',
+                },
+              },
+              {
+                title: '지능 에이전트 분석',
+                weight: 35,
+                levels: {
+                  excellent: '인식-추론-행동 구조를 실생활 에이전트에 논리적으로 적용함',
+                  good: '지능 에이전트의 주요 요소와 작동 흐름을 바르게 분석함',
+                  fair: '에이전트 구성 요소 일부만 제한적으로 연결하여 설명함',
+                  needsWork: '지능 에이전트의 작동 구조 파악에 어려움이 있음',
+                },
+              },
+              {
+                title: '표현 및 의사소통',
+                weight: 25,
+                levels: {
+                  excellent: '탐구 결과를 구조화하여 설득력 있게 발표하고 질문에 명료히 답함',
+                  good: '활동 내용을 체계적으로 정리해 명확히 전달함',
+                  fair: '핵심 내용을 전달하나 근거 정리가 다소 미흡함',
+                  needsWork: '발표 및 정리 자료의 보완이 필요함',
+                },
+              },
+            ],
+            defaultChecklist: [
+              '지능 에이전트의 환경 인식·행동 요소를 구체적으로 구분했는가',
+              '수업 중 제시된 실제 AI 서비스 사례를 2가지 이상 비교했는가',
+              '모둠 토의에서 근거를 들어 자신의 의견을 표현했는가',
+            ],
+          },
+          {
+            code: '2',
+            title: '인공지능의 원리와 활용',
+            summary: '지식 표현, 탐색·추론, 자연어·컴퓨터 비전 인식과 활용',
+            standards: [
+              { code: '[12인기02-01]', text: '문제 해결을 위한 상태 공간과 탐색 알고리즘의 원리를 이해하고 적용한다.' },
+              { code: '[12인기02-02]', text: '지식 표현과 추론 규칙을 활용하여 논리적으로 문제를 해결하는 모델을 설계한다.' },
+              { code: '[12인기02-03]', text: '음성, 시각, 자연어 처리 등 인공지능의 인식 원리를 이해하고 실생활 문제에 활용한다.' },
+            ],
+            defaultRubrics: [
+              {
+                title: '탐색·추론 알고리즘 설계',
+                weight: 40,
+                levels: {
+                  excellent: '상태 공간과 탐색 전략을 정확히 설계하고 효율성을 비교 분석함',
+                  good: '문제 상황에 맞는 탐색 또는 추론 규칙을 적절히 구현함',
+                  fair: '기본 규칙은 작성했으나 예외 상황이나 효율성 고려가 부족함',
+                  needsWork: '탐색·추론 구조 설계 시 교사의 단계적 안내가 필요함',
+                },
+              },
+              {
+                title: '인식·활용 구현력',
+                weight: 35,
+                levels: {
+                  excellent: '시각·언어 인식 원리를 적용해 완성도 높은 해결 방안을 구현함',
+                  good: 'AI 인식 기능의 원리를 이해하고 실습 과제를 안정적으로 수행함',
+                  fair: '도구 활용은 가능하나 원리와 결과 해석 연결이 부족함',
+                  needsWork: '실습 도구의 기본 조작 및 결과 해석 연습이 필요함',
+                },
+              },
+              {
+                title: '개선 및 성찰',
+                weight: 25,
+                levels: {
+                  excellent: '오류 사례를 스스로 분석하고 알고리즘 개선안을 구체적으로 제시함',
+                  good: '실행 결과를 점검해 오류 원인을 찾고 보완함',
+                  fair: '단순 실행 결과만 확인하고 개선 시도까지는 이어지지 않음',
+                  needsWork: '결과 점검 및 오류 수정 과정의 참여가 부족함',
+                },
+              },
+            ],
+            defaultChecklist: [
+              '문제 상태와 목표 상태를 명확하게 정의했는가',
+              '실습 결과에서 발생한 오분류·오류 원인을 점검했는가',
+              '실생활 적용 가능성과 한계점을 함께 서술했는가',
+            ],
+          },
+          {
+            code: '3',
+            title: '데이터와 기계학습',
+            summary: '데이터 수집·정제·시각화와 지도/비지도 학습 모델 학습 및 성능 평가',
+            standards: [
+              { code: '[12인기03-01]', text: '문제 해결에 필요한 데이터를 수집·정제·시각화하여 데이터의 속성과 편향성을 파악한다.' },
+              { code: '[12인기03-02]', text: '지도학습과 비지도학습의 차이를 이해하고, 문제에 적합한 기계학습 모델을 선택해 학습시킨다.' },
+              { code: '[12인기03-03]', text: '모델의 성능 평가 지표(정확도, 정밀도, 재현율 등)를 해석하여 모델을 개선한다.' },
+            ],
+            defaultRubrics: [
+              {
+                title: '데이터 전처리 및 특성 탐색',
+                weight: 35,
+                levels: {
+                  excellent: '결측치·이상치 처리와 편향성 점검을 철저히 수행하고 근거를 제시함',
+                  good: '학습에 필요한 데이터 정제와 특성 선택을 바르게 수행함',
+                  fair: '기초 전처리는 수행했으나 데이터 편향성 점검이 다소 미흡함',
+                  needsWork: '데이터 정제 기준 이해 및 실습 보완이 필요함',
+                },
+              },
+              {
+                title: '기계학습 모델링 및 검증',
+                weight: 40,
+                levels: {
+                  excellent: '훈련/평가 데이터 분리와 하이퍼파라미터 조정을 통해 성능을 체계적으로 개선함',
+                  good: '적절한 학습 모델을 선택해 학습과 검증을 원활히 완료함',
+                  fair: '기본 모델 학습은 완료했으나 성능 지표 해석이 제한적임',
+                  needsWork: '학습·평가 데이터 개념 및 모델 실행 과정의 보충이 필요함',
+                },
+              },
+              {
+                title: '성능 해석 및 보고서 작성',
+                weight: 25,
+                levels: {
+                  excellent: '혼동행렬과 평가 지표를 바탕으로 모델의 한계와 개선 방향을 명료히 제시함',
+                  good: '정확도 등 주요 지표를 바르게 해석하여 결과 보고서를 작성함',
+                  fair: '수치 결과는 기록했으나 의미 해석 설명이 부족함',
+                  needsWork: '모델 성능 결과 정리 및 해석 보완이 필요함',
+                },
+              },
+            ],
+            defaultChecklist: [
+              '훈련 데이터와 테스트 데이터를 올바르게 분리했는가',
+              '데이터 불균형 또는 편향 가능성을 확인했는가',
+              '정확도 외에 오차 원인을 구체적으로 서술했는가',
+            ],
+          },
+          {
+            code: '4',
+            title: '인공지능의 사회적 영향',
+            summary: 'AI 윤리, 알고리즘 편향성, 저작권·개인정보 보호 및 지속 가능한 AI 사회',
+            standards: [
+              { code: '[12인기04-01]', text: '인공지능 기술이 사회, 산업, 직업 세계에 미치는 긍정적·부정적 영향을 균형 있게 분석한다.' },
+              { code: '[12인기04-02]', text: '알고리즘 편향성, 프라이버시, 책임성 등 인공지능 윤리 쟁점을 사례를 통해 비판적으로 탐구한다.' },
+              { code: '[12인기04-03]', text: '인간 중심의 지속 가능한 인공지능 사회를 위한 윤리적 기준과 실천 방안을 제안한다.' },
+            ],
+            defaultRubrics: [
+              {
+                title: '윤리적 쟁점 분석의 깊이',
+                weight: 40,
+                levels: {
+                  excellent: '이해관계자 관점을 다각도로 분석해 편향성·책임성 문제를 심층 규명함',
+                  good: 'AI 윤리 사례의 핵심 쟁점과 사회적 파급력을 타당하게 분석함',
+                  fair: '단편적인 장단점만 나열하고 윤리적 근거 연결이 부족함',
+                  needsWork: '사례의 윤리적 쟁점 파악을 위한 추가 안내가 필요함',
+                },
+              },
+              {
+                title: '대안 및 실천 방안 제시',
+                weight: 35,
+                levels: {
+                  excellent: '기술적·제도적·사용자 관점의 구체적이고 실현 가능한 해결 방안을 제안함',
+                  good: '문제 해결을 위한 합리적인 개선 방안과 윤리 기준을 제시함',
+                  fair: '일반적인 수준의 해결책만 제시해 구체성이 부족함',
+                  needsWork: '윤리 기준과 실천 방안 도출 연습이 필요함',
+                },
+              },
+              {
+                title: '토론 태도 및 경청',
+                weight: 25,
+                levels: {
+                  excellent: '타인의 관점을 존중하며 근거 있는 반론과 합의를 주도적으로 이끌어냄',
+                  good: '모둠 토의에 적극 참여하며 다른 의견을 경청함',
+                  fair: '토의에 참여하나 적극적인 의견 개진이 다소 부족함',
+                  needsWork: '모둠 토의 참여도 향상이 필요함',
+                },
+              },
+            ],
+            defaultChecklist: [
+              '긍정적 영향과 부정적 영향을 균형 있게 서술했는가',
+              '알고리즘 편향 또는 개인정보 보호 사례를 구체적으로 인용했는가',
+              '토론에서 상대방 주장의 근거를 경청하고 존중했는가',
+            ],
+          },
+        ];
+
+        var ATTITUDE_ACTIONS = [
+          { type: 'question', label: '질문/탐구', delta: 3 },
+          { type: 'presentation', label: '발표/설명', delta: 4 },
+          { type: 'cooperation', label: '협력/배려', delta: 3 },
+          { type: 'focus', label: '집중/과제완수', delta: 2 },
+          { type: 'warning', label: '집중필요', delta: -3 },
+        ];
+
+        var LEVEL_LABELS = {
+          excellent: '탁월 (4)',
+          good: '우수 (3)',
+          fair: '보통 (2)',
+          needsWork: '노력 (1)',
+        };
+
+        var LEVEL_POINTS = {
+          excellent: 4,
+          good: 3,
+          fair: 2,
+          needsWork: 1,
+        };
+
+        function uid(prefix) {
+          return (prefix || 'id') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+        }
+
+        function escapeHtml(value) {
+          return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+
+        function clampScore(value) {
+          var n = Number(value);
+          if (!isFinite(n)) return 0;
+          return Math.max(0, Math.min(100, Math.round(n * 10) / 10));
+        }
+
+        function calculateNeisBytes(text) {
+          var str = String(text || '');
+          var bytes = 0;
+          for (var i = 0; i < str.length; i++) {
+            var code = str.charCodeAt(i);
+            if (str[i] === '\n') bytes += 2;
+            else if (code > 127) bytes += 3;
+            else bytes += 1;
+          }
+          return bytes;
+        }
+
+        function computeRubricPercentage(activity, rubricScores) {
+          if (!activity || !activity.rubricCriteria || !activity.rubricCriteria.length) return 0;
+          var weightedSum = 0;
+          var totalWeight = 0;
+          activity.rubricCriteria.forEach(function (c) {
+            var lvl = rubricScores ? rubricScores[c.id] : null;
+            var ratio = lvl ? LEVEL_POINTS[lvl] / 4 : 0;
+            weightedSum += ratio * c.weight;
+            totalWeight += c.weight;
+          });
+          if (totalWeight <= 0) return 0;
+          return Math.round((weightedSum / totalWeight) * 1000) / 10;
+        }
+
+        function computeTotalScore(activity, ev) {
+          var w = activity.weights;
+          var rubricPct = computeRubricPercentage(activity, ev.rubricScores);
+          var artifactPct = clampScore(ev.artifact ? ev.artifact.score : 0);
+          var selfS = ev.peerSelf ? ev.peerSelf.selfScore : 0;
+          var peerS = ev.peerSelf ? ev.peerSelf.peerScore : 0;
+          var peerSelfPct = clampScore((selfS + peerS) / 2);
+          var attPct = clampScore(ev.attitudeScore != null ? ev.attitudeScore : 80);
+          var total =
+            (rubricPct * w.rubric +
+              artifactPct * w.artifact +
+              peerSelfPct * w.peerSelf +
+              attPct * w.attitude) /
+            100;
+          return Math.round(total * 10) / 10;
+        }
+
+        function createEmptyEvaluation(classId, activityId, studentId) {
+          return {
+            id: activityId + '_' + studentId,
+            classId: classId,
+            activityId: activityId,
+            studentId: studentId,
+            rubricScores: {},
+            checklistChecked: [],
+            attitudeLogs: [],
+            attitudeScore: 80,
+            artifact: { score: 0, summary: '', feedback: '' },
+            peerSelf: { selfScore: 0, selfNote: '', peerScore: 0, peerNote: '' },
+            observationMemo: '',
+            aiFeedbackDraft: '',
+            aiSeTeukDraft: '',
+            totalScore: 0,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+
+        // Pure JS ZIP generator (Store mode + CRC32) for file:// & Vercel compatibility
+        var CRC_TABLE = (function () {
+          var table = new Uint32Array(256);
+          for (var n = 0; n < 256; n++) {
+            var c = n;
+            for (var k = 0; k < 8; k++) {
+              c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+            }
+            table[n] = c >>> 0;
+          }
+          return table;
+        })();
+
+        function crc32(bytes) {
+          var crc = 0xffffffff;
+          for (var i = 0; i < bytes.length; i++) {
+            crc = CRC_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+          }
+          return (crc ^ 0xffffffff) >>> 0;
+        }
+
+        function buildSingleFileZip(fileName, contentText) {
+          var encoder = new TextEncoder();
+          var nameBytes = encoder.encode(fileName);
+          var dataBytes = encoder.encode(contentText);
+          var crc = crc32(dataBytes);
+          var now = new Date();
+          var dosTime =
+            ((now.getHours() & 0x1f) << 11) |
+            ((now.getMinutes() & 0x3f) << 5) |
+            ((now.getSeconds() >> 1) & 0x1f);
+          var dosDate =
+            (((Math.max(1980, now.getFullYear()) - 1980) & 0x7f) << 9) |
+            (((now.getMonth() + 1) & 0x0f) << 5) |
+            (now.getDate() & 0x1f);
+
+          var localHeaderSize = 30 + nameBytes.length;
+          var centralHeaderSize = 46 + nameBytes.length;
+          var endSize = 22;
+          var totalSize = localHeaderSize + dataBytes.length + centralHeaderSize + endSize;
+          var buffer = new Uint8Array(totalSize);
+          var view = new DataView(buffer.buffer);
+
+          // Local file header
+          view.setUint32(0, 0x04034b50, true);
+          view.setUint16(4, 20, true);
+          view.setUint16(6, 0x0800, true); // UTF-8
+          view.setUint16(8, 0, true); // Store
+          view.setUint16(10, dosTime, true);
+          view.setUint16(12, dosDate, true);
+          view.setUint32(14, crc, true);
+          view.setUint32(18, dataBytes.length, true);
+          view.setUint32(22, dataBytes.length, true);
+          view.setUint16(26, nameBytes.length, true);
+          view.setUint16(28, 0, true);
+          buffer.set(nameBytes, 30);
+          buffer.set(dataBytes, localHeaderSize);
+
+          var centralOffset = localHeaderSize + dataBytes.length;
+          // Central directory header
+          view.setUint32(centralOffset + 0, 0x02014b50, true);
+          view.setUint16(centralOffset + 4, 20, true);
+          view.setUint16(centralOffset + 6, 20, true);
+          view.setUint16(centralOffset + 8, 0x0800, true);
+          view.setUint16(centralOffset + 10, 0, true);
+          view.setUint16(centralOffset + 12, dosTime, true);
+          view.setUint16(centralOffset + 14, dosDate, true);
+          view.setUint32(centralOffset + 16, crc, true);
+          view.setUint32(centralOffset + 20, dataBytes.length, true);
+          view.setUint32(centralOffset + 24, dataBytes.length, true);
+          view.setUint16(centralOffset + 28, nameBytes.length, true);
+          view.setUint16(centralOffset + 30, 0, true);
+          view.setUint16(centralOffset + 32, 0, true);
+          view.setUint16(centralOffset + 34, 0, true);
+          view.setUint16(centralOffset + 36, 0, true);
+          view.setUint32(centralOffset + 38, 0, true);
+          view.setUint32(centralOffset + 42, 0, true);
+          buffer.set(nameBytes, centralOffset + 46);
+
+          var endOffset = centralOffset + centralHeaderSize;
+          view.setUint32(endOffset + 0, 0x06054b50, true);
+          view.setUint16(endOffset + 4, 0, true);
+          view.setUint16(endOffset + 6, 0, true);
+          view.setUint16(endOffset + 8, 1, true);
+          view.setUint16(endOffset + 10, 1, true);
+          view.setUint32(endOffset + 12, centralHeaderSize, true);
+          view.setUint32(endOffset + 16, centralOffset, true);
+          view.setUint16(endOffset + 20, 0, true);
+
+          return new Blob([buffer], { type: 'application/zip' });
+        }
+
+        // Application State
+        var state = {
+          darkMode: false,
+          activeView: 'eval',
+          classes: [],
+          selectedClassId: '',
+          students: [],
+          activities: [],
+          selectedActivityId: '',
+          evaluations: {}, // map of activityId_studentId -> evaluation
+          searchQuery: '',
+          groupFilter: 'all',
+          inlineEditStudentId: null,
+          inlineDraft: null,
+          activeEvalStudentId: null,
+          aiTargetStudentId: '',
+          aiMode: 'seteuk',
+          aiFocusCompetency: '인공지능 원리 이해 및 문제 해결 역량',
+          aiTargetLength: 'standard',
+          aiDraftText: '',
+          aiEvidenceUsed: [],
+          modal: null, // 'class' | 'activity' | 'peerImport' | null
+          editingActivityId: null,
+          classModalEditStudentId: null,
+          banner: null, // { type: 'ok' | 'error', text: string }
+        };
+
+        function loadStateFromStorage() {
+          try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            var parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              state.darkMode = Boolean(parsed.darkMode);
+              state.classes = Array.isArray(parsed.classes) ? parsed.classes : [];
+              state.selectedClassId = parsed.selectedClassId || (state.classes[0] ? state.classes[0].id : '');
+              state.students = Array.isArray(parsed.students) ? parsed.students : [];
+              state.activities = Array.isArray(parsed.activities) ? parsed.activities : [];
+              state.selectedActivityId = parsed.selectedActivityId || '';
+              state.evaluations = parsed.evaluations && typeof parsed.evaluations === 'object' ? parsed.evaluations : {};
+            }
+          } catch (e) {
+            // fallback to empty memory state if storage is unavailable
+          }
+          syncSelectedClassAndActivity();
+        }
+
+        function saveStateToStorage() {
+          try {
+            var payload = {
+              darkMode: state.darkMode,
+              classes: state.classes,
+              selectedClassId: state.selectedClassId,
+              students: state.students,
+              activities: state.activities,
+              selectedActivityId: state.selectedActivityId,
+              evaluations: state.evaluations,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          } catch (e) {
+            // ignore storage quota errors
+          }
+        }
+
+        function syncSelectedClassAndActivity() {
+          if (!state.classes.some(function (c) { return c.id === state.selectedClassId; })) {
+            state.selectedClassId = state.classes[0] ? state.classes[0].id : '';
+          }
+          var classActs = getClassActivities();
+          if (!classActs.some(function (a) { return a.id === state.selectedActivityId; })) {
+            state.selectedActivityId = classActs[0] ? classActs[0].id : '';
+          }
+          var classSts = getClassStudents();
+          if (!classSts.some(function (s) { return s.id === state.aiTargetStudentId; })) {
+            state.aiTargetStudentId = classSts[0] ? classSts[0].id : '';
+          }
+        }
+
+        function getActiveClass() {
+          return state.classes.find(function (c) { return c.id === state.selectedClassId; }) || null;
+        }
+
+        function getClassStudents() {
+          return state.students
+            .filter(function (s) { return s.classId === state.selectedClassId; })
+            .slice()
+            .sort(function (a, b) { return a.studentNumber.localeCompare(b.studentNumber, 'ko'); });
+        }
+
+        function getClassActivities() {
+          return state.activities
+            .filter(function (a) { return a.classId === state.selectedClassId; })
+            .slice()
+            .sort(function (a, b) { return (b.activityDate || '').localeCompare(a.activityDate || ''); });
+        }
+
+        function getActiveActivity() {
+          return getClassActivities().find(function (a) { return a.id === state.selectedActivityId; }) || null;
+        }
+
+        function getEvaluation(activityId, studentId) {
+          return state.evaluations[activityId + '_' + studentId] || null;
+        }
+
+        function setEvaluation(activity, studentId, patch) {
+          var key = activity.id + '_' + studentId;
+          var base = state.evaluations[key] || createEmptyEvaluation(activity.classId, activity.id, studentId);
+          var next = Object.assign({}, base, patch, { updatedAt: new Date().toISOString() });
+          next.totalScore = computeTotalScore(activity, next);
+          state.evaluations[key] = next;
+          saveStateToStorage();
+          return next;
+        }
+
+        function seedSampleClassroom() {
+          var classId = uid('cls');
+          var newClass = {
+            id: classId,
+            name: '2학년 3반',
+            semester: '2026-1학기',
+            subject: '인공지능 기초',
+          };
+          state.classes.push(newClass);
+          state.selectedClassId = classId;
+
+          var domain = CURRICULUM_DOMAINS[2]; // 데이터와 기계학습
+          var activityId = uid('act');
+          var rubricCriteria = domain.defaultRubrics.map(function (r, idx) {
+            return { id: 'rub_' + idx + '_' + Date.now().toString(36), title: r.title, weight: r.weight, levels: r.levels };
+          });
+          var newActivity = {
+            id: activityId,
+            classId: classId,
+            title: '교내 급식 잔반 예측 모델 설계 및 편향성 검증',
+            domainCode: domain.code,
+            domainTitle: domain.title,
+            standards: ['[12인기03-01]', '[12인기03-02]', '[12인기03-03]'],
+            activityDate: new Date().toISOString().slice(0, 10),
+            weights: { rubric: 40, artifact: 30, peerSelf: 15, attitude: 15 },
+            rubricCriteria: rubricCriteria,
+            checklistItems: domain.defaultChecklist.slice(),
+          };
+          state.activities.push(newActivity);
+          state.selectedActivityId = activityId;
+
+          var sampleStudents = [
+            { studentNumber: '20301', name: '김도윤', groupName: '1모둠', rubric: ['excellent', 'excellent', 'good'], artifactScore: 92, summary: '요일·메뉴별 잔반량 데이터를 정규화하고 의사결정나무와 랜덤포레스트를 비교함.', feedback: '특성 중요도 해석이 매우 구체적임.', selfScore: 90, selfNote: '결측치 처리 기준을 직접 세워 정확도를 8% 높였습니다.', peerScore: 92, peerNote: '팀원들의 데이터 시각화 오류를 친절히 도와주었습니다.', att: 91, memo: '교차검증 도입 필요성을 스스로 질문하고 실험 보고서에 반영함.' },
+            { studentNumber: '20302', name: '이서연', groupName: '1모둠', rubric: ['excellent', 'good', 'excellent'], artifactScore: 89, summary: '급식 식단 키워드 원-핫 인코딩 및 혼동행렬 기반 재현율 비교 보고서 작성.', feedback: '오분류 사례에 대한 시각화가 우수함.', selfScore: 88, selfNote: '정밀도와 재현율 차이를 실제 잔반 문제와 연결해 보았습니다.', peerScore: 90, peerNote: '발표 자료 구성과 근거 설명이 명쾌했습니다.', att: 89, memo: '모둠 토의 시 모델의 과적합 위험을 구체적 그래프로 설명함.' },
+            { studentNumber: '20303', name: '박지후', groupName: '2모둠', rubric: ['good', 'good', 'fair'], artifactScore: 82, summary: '날씨와 요일 변수를 활용한 회귀 모델 구현 및 RMSE 비교.', feedback: '기초 모델 구축이 안정적이나 데이터 불균형 설명 보완 권장.', selfScore: 84, selfNote: '데이터 수집 과정에서 비가 오는 날 표본이 적다는 점을 알게 되었습니다.', peerScore: 83, peerNote: '성실히 실습을 완수하고 발표를 준비했습니다.', att: 85, memo: '실습 도중 오류 원인을 스스로 디버깅하며 끝까지 과제를 완성함.' },
+            { studentNumber: '20304', name: '최하은', groupName: '2모둠', rubric: ['good', 'excellent', 'good'], artifactScore: 90, summary: '계절별 데이터 편향성을 탐지하고 리샘플링 전후 성능 변화 비교.', feedback: '데이터 편향 점검 접근이 매우 인상적임.', selfScore: 92, selfNote: '특정 달 데이터 부족 문제를 보완하니 예측 일관성이 좋아졌습니다.', peerScore: 89, peerNote: '윤리적·편향성 관점에서 날카로운 질문을 던졌습니다.', att: 90, memo: '데이터 편향이 사회적 의사결정에 미치는 영향을 적극 탐구함.' },
+            { studentNumber: '20305', name: '정우진', groupName: '3모둠', rubric: ['fair', 'good', 'good'], artifactScore: 78, summary: '기본 의사결정나무 모델을 학습하고 예측 결과를 표로 정리함.', feedback: '기본 모델 구현은 완료했으며 테스트 데이터 검증 해석을 추가하면 좋겠음.', selfScore: 80, selfNote: '훈련 데이터와 테스트 데이터를 나누는 이유를 실습으로 이해했습니다.', peerScore: 81, peerNote: '모둠 자료 정리를 꼼꼼하게 맡아주었습니다.', att: 83, memo: '질문을 통해 과적합 개념을 이해하고 메모로 정리함.' },
+            { studentNumber: '20306', name: '한지민', groupName: '3모둠', rubric: ['excellent', 'excellent', 'excellent'], artifactScore: 95, summary: '앙상블 모델 하이퍼파라미터 튜닝 및 비용 민감 예측 지표 제안.', feedback: '탐구 깊이와 보고서 논리 구조가 매우 뛰어남.', selfScore: 94, selfNote: '단순 정확도보다 잔반 낭비 비용을 줄이는 지표 설계에 집중했습니다.', peerScore: 95, peerNote: '팀 전체의 코드 구조를 정리하고 방향을 이끌어주었습니다.', att: 95, memo: '실생활 문제 맥락에 맞춰 모델 평가 지표를 재설계하는 탁월한 역량을 보임.' },
+          ];
+
+          sampleStudents.forEach(function (item) {
+            var stId = uid('stu');
+            state.students.push({
+              id: stId,
+              classId: classId,
+              studentNumber: item.studentNumber,
+              name: item.name,
+              groupName: item.groupName,
+            });
+            var rubricScores = {};
+            rubricCriteria.forEach(function (c, i) {
+              rubricScores[c.id] = item.rubric[i] || 'good';
+            });
+            setEvaluation(newActivity, stId, {
+              rubricScores: rubricScores,
+              checklistChecked: domain.defaultChecklist.slice(0, 2),
+              attitudeLogs: [{ label: '질문/탐구', delta: 3, time: '수업 중' }],
+              attitudeScore: item.att,
+              artifact: { score: item.artifactScore, summary: item.summary, feedback: item.feedback },
+              peerSelf: {
+                selfScore: item.selfScore,
+                selfNote: item.selfNote,
+                peerScore: item.peerScore,
+                peerNote: item.peerNote,
+              },
+              observationMemo: item.memo,
+            });
+          });
+
+          state.aiTargetStudentId = state.students.find(function (s) { return s.classId === classId; }).id;
+          saveStateToStorage();
+          setBanner('ok', '2학년 3반 샘플 학급 및 6명의 평가 데이터를 불러왔습니다.');
+        }
+
+        function generateEvidenceDraft(student, activity, ev, mode, focusCompetency, targetLength) {
+          var rubricDetails = [];
+          var evidence = [];
+          activity.rubricCriteria.forEach(function (c) {
+            var lvl = ev.rubricScores[c.id];
+            if (lvl && c.levels[lvl]) {
+              rubricDetails.push(c.levels[lvl]);
+              evidence.push(c.title + '(' + LEVEL_LABELS[lvl].split(' ')[0] + ')');
+            }
+          });
+
+          var checklistDone = (ev.checklistChecked || []).slice();
+          if (checklistDone.length > 0) evidence.push('체크리스트 ' + checklistDone.length + '항목');
+          if (ev.artifact && ev.artifact.summary) evidence.push('산출물 요약');
+          if (ev.observationMemo) evidence.push('교사 관찰 메모');
+          if (ev.peerSelf && (ev.peerSelf.selfNote || ev.peerSelf.peerNote)) evidence.push('자기·동료평가');
+          if (evidence.length === 0) evidence.push(activity.domainTitle + ' 수업 참여');
+
+          var cleanClause = function (txt) {
+            return String(txt || '')
+              .trim()
+              .replace(/[.!?]+$/, '')
+              .replace(/함$/, '하고')
+              .replace(/임$/, '이며');
+          };
+
+          if (mode === 'feedback') {
+            var parts = [];
+            parts.push(
+              student.name +
+                ' 학생, 이번 「' +
+                activity.title +
+                '」(' +
+                activity.domainTitle +
+                ') 활동에 성실히 참여했어요.'
+            );
+            if (ev.artifact && ev.artifact.summary) {
+              parts.push('특히 "' + ev.artifact.summary.replace(/[.]+$/, '') + '" 부분에서 핵심 개념을 실제 문제에 적용하려는 노력이 잘 드러났어요.');
+            } else if (rubricDetails.length > 0) {
+              parts.push('평가 과정에서도 ' + cleanClause(rubricDetails[0]) + ' 점이 돋보였어요.');
+            }
+            if (ev.observationMemo) {
+              parts.push('수업 중 관찰한 "' + ev.observationMemo.replace(/[.]+$/, '') + '" 모습도 매우 인상적이었어요.');
+            }
+            if (ev.artifact && ev.artifact.feedback) {
+              parts.push('교사 코멘트처럼 ' + ev.artifact.feedback.replace(/[.]+$/, '') + ' 부분을 이어가 보세요.');
+            } else {
+              parts.push('다음 활동에서는 실행 결과의 한계점과 개선 아이디어를 한 가지 더 구체적으로 정리해 보면 더욱 완성도가 높아질 거예요.');
+            }
+            return { draftText: parts.join(' '), evidenceUsed: evidence.slice(0, 4) };
+          }
+
+          // NEIS 세특 문체 생성
+          var sentences = [];
+          sentences.push(
+            '「' +
+              activity.title +
+              '」 탐구 활동에서 ' +
+              activity.domainTitle +
+              ' 영역의 핵심 원리를 바탕으로 ' +
+              focusCompetency +
+              '을(를) 발휘함.'
+          );
+
+          if (ev.artifact && ev.artifact.summary) {
+            sentences.push(ev.artifact.summary.trim().replace(/[.]+$/, '') + '.');
+          } else if (rubricDetails.length > 0) {
+            sentences.push(rubricDetails[0].trim().replace(/[.]+$/, '') + '.');
+          }
+
+          if (targetLength !== 'short' && checklistDone.length > 0) {
+            var firstCheck = checklistDone[0].replace(/했는가\??$/, '하는 과정을 체계적으로 점검함.').replace(/서술했는가\??$/, '서술함.');
+            sentences.push(firstCheck);
+          }
+
+          if (ev.observationMemo) {
+            sentences.push(ev.observationMemo.trim().replace(/[.]+$/, '') + '.');
+          }
+
+          if (targetLength === 'detailed') {
+            if (ev.peerSelf && ev.peerSelf.selfNote) {
+              sentences.push(
+                '자기 성찰 과정에서 ' +
+                  ev.peerSelf.selfNote
+                    .trim()
+                    .replace(/했습니다\.?$/, '함을 스스로 확인함.')
+                    .replace(/되었습니다\.?$/, '됨을 성찰함.')
+                    .replace(/[.]+$/, '') +
+                  '.'
+              );
+            }
+            if (ev.peerSelf && ev.peerSelf.peerNote) {
+              sentences.push('모둠 협력 활동에서도 동료들로부터 긍정적인 기여를 인정받으며 의사소통 역량을 보임.');
+            }
+          }
+
+          var text = sentences
+            .join(' ')
+            .replace(/\.\./g, '.')
+            .replace(/\s+/g, ' ')
+            .trim();
+          return { draftText: text, evidenceUsed: evidence.slice(0, 4) };
+        }
+
+        function setBanner(type, text) {
+          state.banner = { type: type, text: text };
+        }
+
+        function triggerDownload(filename, blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 1000);
+        }
+
+        function getPristineIndexHtml() {
+          return PRISTINE_SOURCE_HTML;
+        }
+
+        function exportSingleHtml() {
+          var html = getPristineIndexHtml();
+          triggerDownload('index.html', new Blob([html], { type: 'text/html;charset=utf-8' }));
+          setBanner('ok', '단일 index.html 파일을 다운로드했습니다. 브라우저에서 바로 더블 클릭해 실행할 수 있습니다.');
+          render();
+        }
+
+        function exportGithubZip() {
+          var html = getPristineIndexHtml();
+          var zipBlob = buildSingleFileZip('index.html', html);
+          triggerDownload('ai-class-eval-studio-vercel.zip', zipBlob);
+          setBanner('ok', 'index.html 단일 파일이 담긴 GitHub·Vercel 배포용 .zip 파일을 다운로드했습니다.');
+          render();
+        }
+
+        function exportCsv() {
+          var cls = getActiveClass();
+          var act = getActiveActivity();
+          if (!cls || !act) return;
+          var headers = [
+            '학급',
+            '활동명',
+            '영역',
+            '학번',
+            '이름',
+            '모둠',
+            '루브릭환산점수',
+            '산출물점수',
+            '자기평가점수',
+            '동료평가점수',
+            '태도점수',
+            '종합환산점수',
+            '루브릭상세',
+            '관찰메모',
+            '학생피드백초안',
+            '생활기록부세특초안',
+          ];
+          var esc = function (v) {
+            return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+          };
+          var rows = getClassStudents().map(function (st) {
+            var ev = getEvaluation(act.id, st.id) || createEmptyEvaluation(cls.id, act.id, st.id);
+            var rPct = computeRubricPercentage(act, ev.rubricScores);
+            var rDet = act.rubricCriteria
+              .map(function (c) {
+                var l = ev.rubricScores[c.id];
+                return c.title + ':' + (l ? LEVEL_LABELS[l] : '미평가');
+              })
+              .join(' | ');
+            return [
+              cls.name,
+              act.title,
+              act.domainTitle,
+              st.studentNumber,
+              st.name,
+              st.groupName || '',
+              rPct,
+              ev.artifact.score,
+              ev.peerSelf.selfScore,
+              ev.peerSelf.peerScore,
+              ev.attitudeScore,
+              ev.totalScore,
+              rDet,
+              ev.observationMemo,
+              ev.aiFeedbackDraft,
+              ev.aiSeTeukDraft,
+            ]
+              .map(esc)
+              .join(',');
+          });
+          var csv = '\uFEFF' + [headers.map(esc).join(','), rows.join('\r\n')].join('\r\n');
+          triggerDownload(cls.name + '_' + act.title + '_평가결과.csv', new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        }
+
+        function exportJsonBackup() {
+          var payload = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            classes: state.classes,
+            students: state.students,
+            activities: state.activities,
+            evaluations: state.evaluations,
+          };
+          triggerDownload(
+            'ai-class-eval-backup-' + new Date().toISOString().slice(0, 10) + '.json',
+            new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' })
+          );
+          setBanner('ok', '전체 학급 및 평가 데이터를 JSON 백업 파일로 저장했습니다.');
+          render();
+        }
+
+        // SVG Icons (inline, zero external icon library required)
+        function icon(name, size) {
+          var s = size || 15;
+          var paths = {
+            archive: '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+            download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+            upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+            plus: '<line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/>',
+            sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+            moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+            search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+            pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+            check: '<polyline points="20 6 9 17 4 12"/>',
+            x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+            sparkles: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+            book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+            users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+            trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+            copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+            file: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>',
+          };
+          return (
+            '<svg width="' +
+            s +
+            '" height="' +
+            s +
+            '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            (paths[name] || '') +
+            '</svg>'
+          );
+        }
+
+        function renderTopBar(activeClass) {
+          return (
+            '<header class="topbar">' +
+            '<a href="#top" class="brand" data-action="nav-eval">AI-Class Eval Studio</a>' +
+            '<nav class="nav-tabs">' +
+            '<button type="button" class="nav-tab ' + (state.activeView === 'eval' ? 'active' : '') + '" data-action="nav" data-view="eval">실시간 평가표</button>' +
+            '<button type="button" class="nav-tab ' + (state.activeView === 'ai' ? 'active' : '') + '" data-action="nav" data-view="ai">AI 피드백·세특</button>' +
+            '<button type="button" class="nav-tab ' + (state.activeView === 'analytics' ? 'active' : '') + '" data-action="nav" data-view="analytics">성취도 요약</button>' +
+            '<button type="button" class="nav-tab" data-action="open-class-modal">학급·명단</button>' +
+            '</nav>' +
+            '<div class="topbar-actions">' +
+            '<button type="button" class="btn" data-action="download-html" title="브라우저 더블클릭 실행용 단일 index.html 다운로드">' +
+            icon('file', 14) +
+            '<span>index.html</span>' +
+            '</button>' +
+            '<button type="button" class="btn" data-action="download-zip" title="GitHub·Vercel 즉시 배포용 .zip 다운로드">' +
+            icon('archive', 14) +
+            '<span>GitHub .zip</span>' +
+            '</button>' +
+            '<button type="button" class="btn-icon" data-action="toggle-theme" title="테마 전환" aria-label="테마 전환">' +
+            icon(state.darkMode ? 'sun' : 'moon', 15) +
+            '</button>' +
+            '<button type="button" class="btn btn-primary" data-action="open-new-activity" ' + (activeClass ? '' : 'disabled') + '>' +
+            icon('plus', 14) +
+            '<span>새 평가 활동</span>' +
+            '</button>' +
+            '</div>' +
+            '</header>'
+          );
+        }
+
+        function renderSidebar(activeClass, classActivities) {
+          var classOptions = state.classes
+            .map(function (c) {
+              return (
+                '<option value="' +
+                escapeHtml(c.id) +
+                '"' +
+                (c.id === state.selectedClassId ? ' selected' : '') +
+                '>' +
+                escapeHtml(c.name) +
+                ' (' +
+                escapeHtml(c.semester) +
+                ')</option>'
+              );
+            })
+            .join('');
+
+          var actListHtml =
+            classActivities.length === 0
+              ? '<p style="font-size:12px;color:var(--text-muted);margin:0;">등록된 활동이 없습니다.</p>'
+              : '<div class="activity-list">' +
+                classActivities
+                  .map(function (act) {
+                    var selected = act.id === state.selectedActivityId;
+                    return (
+                      '<button type="button" class="activity-item ' +
+                      (selected ? 'selected' : '') +
+                      '" data-action="select-activity" data-id="' +
+                      escapeHtml(act.id) +
+                      '">' +
+                      '<div class="activity-meta mono">' +
+                      escapeHtml(act.domainCode) +
+                      '. ' +
+                      escapeHtml(act.domainTitle) +
+                      ' · ' +
+                      escapeHtml(act.activityDate) +
+                      '</div>' +
+                      '<div class="activity-title">' +
+                      escapeHtml(act.title) +
+                      '</div>' +
+                      '</button>'
+                    );
+                  })
+                  .join('') +
+                '</div>';
+
+          return (
+            '<aside class="sidebar">' +
+            '<div>' +
+            '<div class="side-head"><span class="side-label">담당 학급</span><button type="button" class="link-btn" data-action="open-class-modal">관리</button></div>' +
+            (state.classes.length === 0
+              ? '<button type="button" class="btn" style="width:100%;border-style:dashed;" data-action="open-class-modal">+ 첫 학급 등록하기</button>'
+              : '<select class="select" data-action="select-class">' + classOptions + '</select>') +
+            '</div>' +
+            '<div>' +
+            '<div class="side-head"><span class="side-label">수업 평가 활동</span>' +
+            (activeClass ? '<button type="button" class="link-btn" data-action="open-new-activity">+ 추가</button>' : '') +
+            '</div>' +
+            actListHtml +
+            '</div>' +
+            '<div class="sidebar-footer">' +
+            '<span class="side-label">로컬 백업 · 단일 HTML</span>' +
+            '<div style="display:flex;gap:6px;">' +
+            '<button type="button" class="btn" style="flex:1;" data-action="export-json">' + icon('download', 13) + ' 백업 저장</button>' +
+            '<label class="btn" style="flex:1;cursor:pointer;">' + icon('upload', 13) + ' 복원<input type="file" accept="application/json" data-action="import-json" style="display:none;" /></label>' +
+            '</div>' +
+            '<span style="font-size:11px;color:var(--text-muted);line-height:1.4;">브라우저 자동 저장(localStorage) · 더블클릭 오프라인 실행 지원</span>' +
+            '</div>' +
+            '</aside>'
+          );
+        }
+
+        function renderEvalTable(activeClass, activeActivity, classStudents) {
+          var groupSet = {};
+          classStudents.forEach(function (s) {
+            if (s.groupName && s.groupName.trim()) groupSet[s.groupName.trim()] = true;
+          });
+          var groups = Object.keys(groupSet).sort();
+
+          var q = state.searchQuery.trim().toLowerCase();
+          var filtered = classStudents.filter(function (s) {
+            var mg = state.groupFilter === 'all' || (s.groupName || '') === state.groupFilter;
+            var ms =
+              !q ||
+              s.name.toLowerCase().indexOf(q) !== -1 ||
+              s.studentNumber.toLowerCase().indexOf(q) !== -1 ||
+              (s.groupName || '').toLowerCase().indexOf(q) !== -1;
+            return mg && ms;
+          });
+
+          var groupButtons =
+            '<button type="button" class="seg-btn ' +
+            (state.groupFilter === 'all' ? 'active' : '') +
+            '" data-action="set-group-filter" data-group="all">전체 (' +
+            classStudents.length +
+            ')</button>' +
+            groups
+              .map(function (g) {
+                return (
+                  '<button type="button" class="seg-btn ' +
+                  (state.groupFilter === g ? 'active' : '') +
+                  '" data-action="set-group-filter" data-group="' +
+                  escapeHtml(g) +
+                  '">' +
+                  escapeHtml(g) +
+                  '</button>'
+                );
+              })
+              .join('');
+
+          var rowsHtml = filtered
+            .map(function (st) {
+              var ev = getEvaluation(activeActivity.id, st.id);
+              var isEdit = state.inlineEditStudentId === st.id && state.inlineDraft;
+              var rated = ev ? Object.keys(ev.rubricScores).length : 0;
+              var rTotal = activeActivity.rubricCriteria.length;
+              var rPct = ev ? computeRubricPercentage(activeActivity, ev.rubricScores) : 0;
+              var peerSelfAvg = ev ? Math.round(((ev.peerSelf.selfScore + ev.peerSelf.peerScore) / 2) * 10) / 10 : 0;
+
+              var previewTotal = isEdit
+                ? computeTotalScore(activeActivity, {
+                    rubricScores: ev ? ev.rubricScores : {},
+                    artifact: { score: clampScore(state.inlineDraft.artifactScore) },
+                    peerSelf: {
+                      selfScore: clampScore(state.inlineDraft.selfScore),
+                      peerScore: clampScore(state.inlineDraft.peerScore),
+                    },
+                    attitudeScore: clampScore(state.inlineDraft.attitudeScore),
+                  })
+                : ev
+                ? ev.totalScore
+                : 0;
+
+              return (
+                '<tr>' +
+                '<td class="mono">' +
+                (isEdit
+                  ? '<input type="text" class="mini-input mono" style="width:76px;" data-inline-field="studentNumber" value="' + escapeHtml(state.inlineDraft.studentNumber) + '" />'
+                  : escapeHtml(st.studentNumber)) +
+                '</td>' +
+                '<td style="font-weight:600;">' +
+                (isEdit
+                  ? '<input type="text" class="mini-input" style="width:88px;" data-inline-field="name" value="' + escapeHtml(state.inlineDraft.name) + '" />'
+                  : '<button type="button" class="link-btn" style="color:var(--text);font-weight:600;font-size:13px;" data-action="open-eval-drawer" data-id="' + escapeHtml(st.id) + '">' + escapeHtml(st.name) + '</button>') +
+                '</td>' +
+                '<td style="color:var(--text-muted);font-size:12px;">' +
+                (isEdit
+                  ? '<input type="text" class="mini-input" style="width:72px;" data-inline-field="groupName" value="' + escapeHtml(state.inlineDraft.groupName) + '" placeholder="모둠" />'
+                  : escapeHtml(st.groupName || '-')) +
+                '</td>' +
+                '<td class="num-right mono" style="font-size:12px;"><span style="color:' +
+                (rated === rTotal && rTotal > 0 ? 'var(--emerald)' : 'var(--text-muted)') +
+                ';">' +
+                rPct +
+                ' (' +
+                rated +
+                '/' +
+                rTotal +
+                ')</span></td>' +
+                '<td class="num-right mono">' +
+                (isEdit
+                  ? '<input type="number" min="0" max="100" class="mini-input mono" style="width:62px;text-align:right;" data-inline-field="artifactScore" value="' + escapeHtml(state.inlineDraft.artifactScore) + '" />'
+                  : ev
+                  ? ev.artifact.score
+                  : 0) +
+                '</td>' +
+                '<td class="num-right mono">' +
+                (isEdit
+                  ? '<span style="display:inline-flex;align-items:center;gap:4px;">' +
+                    '<input type="number" min="0" max="100" title="자기평가" class="mini-input mono" style="width:54px;text-align:right;" data-inline-field="selfScore" value="' + escapeHtml(state.inlineDraft.selfScore) + '" />' +
+                    '/' +
+                    '<input type="number" min="0" max="100" title="동료평가" class="mini-input mono" style="width:54px;text-align:right;" data-inline-field="peerScore" value="' + escapeHtml(state.inlineDraft.peerScore) + '" />' +
+                    '</span>'
+                  : peerSelfAvg) +
+                '</td>' +
+                '<td>' +
+                (isEdit
+                  ? '<input type="number" min="0" max="100" class="mini-input mono" style="width:62px;" data-inline-field="attitudeScore" value="' + escapeHtml(state.inlineDraft.attitudeScore) + '" />'
+                  : '<div style="display:flex;align-items:center;gap:4px;">' +
+                    '<span class="mono" style="width:32px;font-size:12px;font-weight:600;">' +
+                    (ev ? ev.attitudeScore : 80) +
+                    '</span>' +
+                    ATTITUDE_ACTIONS.slice(0, 3)
+                      .map(function (a) {
+                        return (
+                          '<button type="button" class="att-btn" data-action="quick-att" data-id="' +
+                          escapeHtml(st.id) +
+                          '" data-type="' +
+                          escapeHtml(a.type) +
+                          '">+' +
+                          escapeHtml(a.label.split('/')[0]) +
+                          '</button>'
+                        );
+                      })
+                      .join('') +
+                    '</div>') +
+                '</td>' +
+                '<td class="num-right mono total-score" data-inline-preview-total>' +
+                previewTotal +
+                '</td>' +
+                '<td class="num-right">' +
+                (isEdit
+                  ? '<div style="display:inline-flex;gap:4px;">' +
+                    '<button type="button" class="btn btn-primary" style="padding:5px 10px;" data-action="save-inline" data-id="' + escapeHtml(st.id) + '">' + icon('check', 13) + ' 저장</button>' +
+                    '<button type="button" class="btn-icon" data-action="cancel-inline" aria-label="취소">' + icon('x', 13) + '</button>' +
+                    '</div>'
+                  : '<div style="display:inline-flex;gap:4px;">' +
+                    '<button type="button" class="btn-icon" data-action="start-inline" data-id="' + escapeHtml(st.id) + '" title="학번·이름·점수 빠른 수정">' + icon('pencil', 13) + '</button>' +
+                    '<button type="button" class="btn" style="padding:5px 10px;" data-action="open-eval-drawer" data-id="' + escapeHtml(st.id) + '">평가 입력</button>' +
+                    '<button type="button" class="btn-icon" style="' + (ev && ev.aiSeTeukDraft ? 'border-color:var(--emerald-border);color:var(--emerald);' : '') + '" data-action="go-ai" data-id="' + escapeHtml(st.id) + '" title="AI 피드백·세특 작성">' + icon('sparkles', 13) + '</button>' +
+                    '</div>') +
+                '</td>' +
+                '</tr>'
+              );
+            })
+            .join('');
+
+          return (
+            '<div class="toolbar">' +
+            '<div class="toolbar-left">' +
+            '<div class="search-box">' +
+            icon('search', 14) +
+            '<input type="text" class="search-input" id="searchInput" placeholder="학번 또는 이름 검색" value="' +
+            escapeHtml(state.searchQuery) +
+            '" />' +
+            '</div>' +
+            '<div class="seg-group">' +
+            groupButtons +
+            '</div>' +
+            '</div>' +
+            '<button type="button" class="link-btn" style="display:inline-flex;align-items:center;gap:5px;" data-action="open-class-modal">' +
+            icon('users', 14) +
+            '학생 명단 편집</button>' +
+            '</div>' +
+            (filtered.length === 0
+              ? '<div class="card empty-card" style="margin:0;padding:40px;"><p style="color:var(--text-muted);margin:0 0 12px;">' +
+                (classStudents.length === 0 ? escapeHtml(activeClass.name) + '에 등록된 학생이 없습니다.' : '검색 조건에 일치하는 학생이 없습니다.') +
+                '</p>' +
+                (classStudents.length === 0 ? '<button type="button" class="btn btn-primary" data-action="open-class-modal">학생 명단 등록하기</button>' : '') +
+                '</div>'
+              : '<div class="card table-wrap">' +
+                '<table><thead><tr>' +
+                '<th>학번</th><th>이름</th><th>모둠</th><th class="num-right">루브릭</th><th class="num-right">산출물</th><th class="num-right">자기·동료</th><th>수업 태도 빠른 체크</th><th class="num-right">총점</th><th class="num-right">평가/세특</th>' +
+                '</tr></thead><tbody>' +
+                rowsHtml +
+                '</tbody></table></div>')
+          );
+        }
+
+        function renderAiStudio(activeActivity, classStudents) {
+          if (classStudents.length === 0) {
+            return '<div class="card empty-card"><p style="color:var(--text-muted);">먼저 학급에 학생을 등록해 주세요.</p></div>';
+          }
+          var target = classStudents.find(function (s) { return s.id === state.aiTargetStudentId; }) || classStudents[0];
+          var ev = getEvaluation(activeActivity.id, target.id) || createEmptyEvaluation(activeActivity.classId, activeActivity.id, target.id);
+          var neisBytes = calculateNeisBytes(state.aiDraftText);
+
+          var studentBtns = classStudents
+            .map(function (st) {
+              var stEv = getEvaluation(activeActivity.id, st.id);
+              var hasDraft = stEv && (stEv.aiSeTeukDraft || stEv.aiFeedbackDraft);
+              var active = st.id === target.id;
+              return (
+                '<button type="button" class="activity-item ' +
+                (active ? 'selected' : '') +
+                '" style="display:flex;align-items:center;justify-content:space-between;gap:8px;" data-action="select-ai-student" data-id="' +
+                escapeHtml(st.id) +
+                '">' +
+                '<div><div class="mono" style="font-size:11px;color:var(--text-muted);">' +
+                escapeHtml(st.studentNumber) +
+                '</div><div style="font-size:13px;font-weight:600;">' +
+                escapeHtml(st.name) +
+                '</div></div>' +
+                '<span class="' +
+                (hasDraft ? 'tag tag-ok' : 'tag') +
+                '">' +
+                (hasDraft ? '작성됨' : '대기') +
+                '</span>' +
+                '</button>'
+              );
+            })
+            .join('');
+
+          return (
+            '<div class="split-ai">' +
+            '<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:8px;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<strong style="font-size:13px;">학생 선택 (' + classStudents.length + '명)</strong>' +
+            '<button type="button" class="link-btn" data-action="batch-ai-seteuk">전체 자동 생성</button>' +
+            '</div>' +
+            '<div style="display:flex;flex-direction:column;gap:4px;max-height:520px;overflow-y:auto;">' +
+            studentBtns +
+            '</div>' +
+            '</div>' +
+            '<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+            '<div><div class="mono" style="font-size:12px;color:var(--text-muted);">' +
+            escapeHtml(target.studentNumber) +
+            ' · 총점 ' +
+            ev.totalScore +
+            '점</div><h2 style="margin:2px 0 0;font-size:17px;">' +
+            escapeHtml(target.name) +
+            ' 초안 작성 스튜디오</h2></div>' +
+            '<div class="seg-group">' +
+            '<button type="button" class="seg-btn ' + (state.aiMode === 'seteuk' ? 'active' : '') + '" data-action="set-ai-mode" data-mode="seteuk">생활기록부 세특</button>' +
+            '<button type="button" class="seg-btn ' + (state.aiMode === 'feedback' ? 'active' : '') + '" data-action="set-ai-mode" data-mode="feedback">학생 피드백</button>' +
+            '</div></div>' +
+            '<div class="grid-2">' +
+            '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">강조 핵심 역량</label>' +
+            '<select class="select" data-action="set-ai-competency">' +
+            ['인공지능 원리 이해 및 문제 해결 역량', '데이터 기반 추론 및 모델링 역량', 'AI 윤리 및 비판적 사고 역량', '협력적 의사소통 및 프로젝트 수행 역량']
+              .map(function (c) {
+                return '<option value="' + escapeHtml(c) + '"' + (state.aiFocusCompetency === c ? ' selected' : '') + '>' + escapeHtml(c) + '</option>';
+              })
+              .join('') +
+            '</select></div>' +
+            '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">서술 분량</label>' +
+            '<select class="select" data-action="set-ai-length">' +
+            [
+              { v: 'short', l: '간결 (약 250~330자)' },
+              { v: 'standard', l: '표준 (약 340~420자)' },
+              { v: 'detailed', l: '상세 (약 430~500자)' },
+            ]
+              .map(function (o) {
+                return '<option value="' + o.v + '"' + (state.aiTargetLength === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+              })
+              .join('') +
+            '</select></div></div>' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+            '<button type="button" class="btn btn-primary" data-action="generate-ai-draft">' + icon('sparkles', 14) + ' 평가 근거 기반 초안 생성</button>' +
+            '<span class="mono" style="font-size:12px;color:var(--text-muted);">' + state.aiDraftText.length + '자 · NEIS ' + neisBytes + ' / 1500 Bytes</span>' +
+            '</div>' +
+            (state.aiEvidenceUsed.length > 0
+              ? '<div style="display:flex;flex-wrap:wrap;gap:6px;">' +
+                state.aiEvidenceUsed.map(function (e) { return '<span class="tag">' + escapeHtml(e) + '</span>'; }).join('') +
+                '</div>'
+              : '') +
+            '<textarea class="textarea" rows="8" id="aiDraftTextarea" placeholder="초안 생성 버튼을 누르거나 직접 문구를 편집해 주세요.">' +
+            escapeHtml(state.aiDraftText) +
+            '</textarea>' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+            '<div style="display:flex;gap:8px;">' +
+            '<button type="button" class="btn btn-primary" data-action="save-ai-draft">' + icon('check', 14) + ' 학생 기록에 저장</button>' +
+            '<button type="button" class="btn" data-action="copy-ai-draft">' + icon('copy', 14) + ' 복사</button>' +
+            '</div>' +
+            '<button type="button" class="btn" data-action="export-csv">' + icon('download', 14) + ' 전체 결과 CSV 내보내기</button>' +
+            '</div></div></div>'
+          );
+        }
+
+        function renderAnalytics(activeActivity, classStudents) {
+          var total = classStudents.length;
+          var evList = classStudents.map(function (s) {
+            return getEvaluation(activeActivity.id, s.id) || createEmptyEvaluation(activeActivity.classId, activeActivity.id, s.id);
+          });
+          var completed = classStudents.filter(function (s) {
+            var ev = getEvaluation(activeActivity.id, s.id);
+            return ev && Object.keys(ev.rubricScores).length === activeActivity.rubricCriteria.length;
+          }).length;
+          var draftCount = evList.filter(function (e) { return Boolean(e.aiSeTeukDraft); }).length;
+          var avgTotal = total ? Math.round((evList.reduce(function (a, b) { return a + b.totalScore; }, 0) / total) * 10) / 10 : 0;
+
+          var avgRubric = total
+            ? Math.round((evList.reduce(function (a, e) { return a + computeRubricPercentage(activeActivity, e.rubricScores); }, 0) / total) * 10) / 10
+            : 0;
+          var avgArt = total ? Math.round((evList.reduce(function (a, e) { return a + e.artifact.score; }, 0) / total) * 10) / 10 : 0;
+          var avgPeer = total
+            ? Math.round((evList.reduce(function (a, e) { return a + (e.peerSelf.selfScore + e.peerSelf.peerScore) / 2; }, 0) / total) * 10) / 10
+            : 0;
+          var avgAtt = total ? Math.round((evList.reduce(function (a, e) { return a + e.attitudeScore; }, 0) / total) * 10) / 10 : 0;
+
+          var buckets = [
+            { label: '90점 이상', count: 0 },
+            { label: '80~89점', count: 0 },
+            { label: '70~79점', count: 0 },
+            { label: '60~69점', count: 0 },
+            { label: '60점 미만', count: 0 },
+          ];
+          evList.forEach(function (e) {
+            if (e.totalScore >= 90) buckets[0].count++;
+            else if (e.totalScore >= 80) buckets[1].count++;
+            else if (e.totalScore >= 70) buckets[2].count++;
+            else if (e.totalScore >= 60) buckets[3].count++;
+            else buckets[4].count++;
+          });
+
+          return (
+            '<div class="grid-4">' +
+            '<div class="card" style="padding:18px;"><div style="font-size:12px;color:var(--text-muted);">수강 학생 수</div><div class="mono" style="font-size:26px;font-weight:700;margin-top:4px;">' + total + '명</div></div>' +
+            '<div class="card" style="padding:18px;"><div style="font-size:12px;color:var(--text-muted);">루브릭 평가 완료</div><div class="mono" style="font-size:26px;font-weight:700;margin-top:4px;">' + completed + '/' + total + '</div></div>' +
+            '<div class="card" style="padding:18px;"><div style="font-size:12px;color:var(--text-muted);">평균 종합 점수</div><div class="mono" style="font-size:26px;font-weight:700;color:var(--primary);margin-top:4px;">' + avgTotal + '점</div></div>' +
+            '<div class="card" style="padding:18px;"><div style="font-size:12px;color:var(--text-muted);">세특 초안 작성</div><div class="mono" style="font-size:26px;font-weight:700;color:var(--emerald);margin-top:4px;">' + draftCount + '/' + total + '</div></div>' +
+            '</div>' +
+            '<div class="grid-2">' +
+            '<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px;">' +
+            '<h3 style="margin:0;font-size:15px;">점수 구간별 분포</h3>' +
+            buckets
+              .map(function (b) {
+                var pct = total ? Math.round((b.count / total) * 100) : 0;
+                return (
+                  '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span>' +
+                  b.label +
+                  '</span><span class="mono">' +
+                  b.count +
+                  '명 (' +
+                  pct +
+                  '%)</span></div><div class="progress-track"><div class="progress-fill" style="width:' +
+                  pct +
+                  '%;"></div></div></div>'
+                );
+              })
+              .join('') +
+            '</div>' +
+            '<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="margin:0;font-size:15px;">평가 요소별 평균 달성률</h3><button type="button" class="btn" data-action="export-csv">' + icon('download', 13) + ' CSV</button></div>' +
+            [
+              { label: '루브릭 수행평가', val: avgRubric },
+              { label: '실습 산출물', val: avgArt },
+              { label: '자기·동료평가', val: avgPeer },
+              { label: '수업 태도', val: avgAtt },
+            ]
+              .map(function (row) {
+                return (
+                  '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span>' +
+                  row.label +
+                  '</span><span class="mono">' +
+                  row.val +
+                  '점</span></div><div class="progress-track"><div class="progress-fill" style="width:' +
+                  Math.min(100, row.val) +
+                  '%;"></div></div></div>'
+                );
+              })
+              .join('') +
+            '</div></div>'
+          );
+        }
+
+        function renderModals(activeClass, classStudents, activeActivity) {
+          var html = '';
+
+          // Class & Student Manager Modal
+          if (state.modal === 'class') {
+            var studentRows = classStudents
+              .map(function (st) {
+                var editing = state.classModalEditStudentId === st.id;
+                return (
+                  '<tr>' +
+                  '<td class="mono">' +
+                  (editing ? '<input type="text" class="mini-input mono" style="width:76px;" id="cmNum" value="' + escapeHtml(st.studentNumber) + '" />' : escapeHtml(st.studentNumber)) +
+                  '</td>' +
+                  '<td>' +
+                  (editing ? '<input type="text" class="mini-input" style="width:92px;" id="cmName" value="' + escapeHtml(st.name) + '" />' : escapeHtml(st.name)) +
+                  '</td>' +
+                  '<td>' +
+                  (editing ? '<input type="text" class="mini-input" style="width:76px;" id="cmGroup" value="' + escapeHtml(st.groupName || '') + '" />' : escapeHtml(st.groupName || '-')) +
+                  '</td>' +
+                  '<td class="num-right">' +
+                  (editing
+                    ? '<button type="button" class="btn btn-primary" style="padding:4px 9px;" data-action="cm-save-student" data-id="' + escapeHtml(st.id) + '">저장</button> <button type="button" class="btn" style="padding:4px 9px;" data-action="cm-cancel-student">취소</button>'
+                    : '<button type="button" class="btn-icon" data-action="cm-edit-student" data-id="' + escapeHtml(st.id) + '">' + icon('pencil', 13) + '</button> <button type="button" class="btn-icon" style="color:var(--danger);" data-action="cm-delete-student" data-id="' + escapeHtml(st.id) + '">' + icon('trash', 13) + '</button>') +
+                  '</td>' +
+                  '</tr>'
+                );
+              })
+              .join('');
+
+            html +=
+              '<div class="backdrop" data-action="close-modal-backdrop">' +
+              '<div class="modal">' +
+              '<div class="modal-header"><strong>학급 및 학생 명단 관리</strong><button type="button" class="btn-icon" data-action="close-modal">' + icon('x', 15) + '</button></div>' +
+              '<div class="modal-body">' +
+              '<div style="padding:12px;border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:10px;">' +
+              '<strong style="font-size:13px;">새 학급 추가</strong>' +
+              '<div class="grid-2">' +
+              '<input type="text" class="input" id="newClassName" placeholder="학급명 (예: 2학년 4반)" />' +
+              '<input type="text" class="input" id="newClassSemester" value="2026-1학기" placeholder="학기" />' +
+              '</div>' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">' +
+              (state.classes.length > 0
+                ? '<select class="select" style="max-width:260px;" data-action="select-class">' +
+                  state.classes.map(function (c) { return '<option value="' + escapeHtml(c.id) + '"' + (c.id === state.selectedClassId ? ' selected' : '') + '>' + escapeHtml(c.name) + ' (' + escapeHtml(c.semester) + ')</option>'; }).join('') +
+                  '</select>'
+                : '<span></span>') +
+              '<button type="button" class="btn btn-primary" data-action="create-class">' + icon('plus', 13) + ' 학급 등록</button>' +
+              '</div></div>' +
+              (activeClass
+                ? '<div style="display:flex;flex-direction:column;gap:10px;">' +
+                  '<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="font-size:13px;">' + escapeHtml(activeClass.name) + ' 학생 추가</strong>' +
+                  '<button type="button" class="btn btn-danger" style="padding:5px 10px;" data-action="delete-class">현재 학급 삭제</button></div>' +
+                  '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                  '<input type="text" class="input mono" style="width:110px;" id="addStuNum" placeholder="학번 (20301)" />' +
+                  '<input type="text" class="input" style="width:130px;" id="addStuName" placeholder="이름" />' +
+                  '<input type="text" class="input" style="width:110px;" id="addStuGroup" placeholder="모둠 (1모둠)" />' +
+                  '<button type="button" class="btn btn-primary" data-action="add-student">' + icon('plus', 13) + ' 추가</button>' +
+                  '</div>' +
+                  '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">여러 명 일괄 등록 (한 줄에 "학번, 이름, 모둠")</label>' +
+                  '<div style="display:flex;gap:8px;"><textarea class="textarea" rows="3" id="bulkStuText" placeholder="20301, 김도윤, 1모둠&#10;20302, 이서연, 1모둠"></textarea>' +
+                  '<button type="button" class="btn" data-action="bulk-add-students">일괄 추가</button></div></div>' +
+                  '<div class="card table-wrap" style="max-height:240px;overflow-y:auto;"><table><thead><tr><th>학번</th><th>이름</th><th>모둠</th><th class="num-right">관리</th></tr></thead><tbody>' +
+                  (studentRows || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">등록된 학생이 없습니다.</td></tr>') +
+                  '</tbody></table></div></div>'
+                : '') +
+              '</div>' +
+              '<div class="modal-footer"><span style="font-size:12px;color:var(--text-muted);">변경 사항은 즉시 로컬 저장소에 반영됩니다.</span><button type="button" class="btn btn-primary" data-action="close-modal">완료</button></div>' +
+              '</div></div>';
+          }
+
+          // Activity Builder Modal
+          if (state.modal === 'activity' && activeClass) {
+            var editing = state.editingActivityId ? state.activities.find(function (a) { return a.id === state.editingActivityId; }) : null;
+            var curDomain = CURRICULUM_DOMAINS.find(function (d) { return d.code === (editing ? editing.domainCode : '1'); }) || CURRICULUM_DOMAINS[0];
+            var draftAct = state._activityDraft || {
+              title: editing ? editing.title : curDomain.title + ' 탐구 수행평가',
+              domainCode: curDomain.code,
+              activityDate: editing ? editing.activityDate : new Date().toISOString().slice(0, 10),
+              standards: editing ? editing.standards.slice() : [curDomain.standards[0].code],
+              weights: editing ? Object.assign({}, editing.weights) : { rubric: 40, artifact: 30, peerSelf: 15, attitude: 15 },
+              rubricCriteria: editing
+                ? editing.rubricCriteria.map(function (c) { return Object.assign({}, c); })
+                : curDomain.defaultRubrics.map(function (r, i) { return { id: 'rub_' + i, title: r.title, weight: r.weight, levels: r.levels }; }),
+              checklistItems: editing ? editing.checklistItems.slice() : curDomain.defaultChecklist.slice(),
+            };
+            state._activityDraft = draftAct;
+            var activeDom = CURRICULUM_DOMAINS.find(function (d) { return d.code === draftAct.domainCode; }) || CURRICULUM_DOMAINS[0];
+
+            html +=
+              '<div class="backdrop" data-action="close-modal-backdrop">' +
+              '<div class="modal">' +
+              '<div class="modal-header"><strong>' + (editing ? '평가 활동 · 루브릭 수정' : '새 평가 활동 만들기') + '</strong><button type="button" class="btn-icon" data-action="close-modal">' + icon('x', 15) + '</button></div>' +
+              '<div class="modal-body">' +
+              '<div class="grid-2">' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">교육과정 대단원</label>' +
+              '<select class="select" data-action="act-change-domain">' +
+              CURRICULUM_DOMAINS.map(function (d) {
+                return '<option value="' + d.code + '"' + (d.code === draftAct.domainCode ? ' selected' : '') + '>' + d.code + '. ' + d.title + '</option>';
+              }).join('') +
+              '</select></div>' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">활동 일자</label>' +
+              '<input type="date" class="input" id="actDateInput" value="' + escapeHtml(draftAct.activityDate) + '" /></div>' +
+              '</div>' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">수업 활동명</label>' +
+              '<input type="text" class="input" id="actTitleInput" value="' + escapeHtml(draftAct.title) + '" /></div>' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">관련 성취기준</label>' +
+              '<div style="display:flex;flex-direction:column;gap:6px;">' +
+              activeDom.standards
+                .map(function (st) {
+                  var checked = draftAct.standards.indexOf(st.code) !== -1;
+                  return (
+                    '<label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;cursor:pointer;">' +
+                    '<input type="checkbox" data-action="act-toggle-std" data-code="' + escapeHtml(st.code) + '"' + (checked ? ' checked' : '') + ' />' +
+                    '<span><strong class="mono">' + escapeHtml(st.code) + '</strong> ' + escapeHtml(st.text) + '</span></label>'
+                  );
+                })
+                .join('') +
+              '</div></div>' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">평가 영역별 반영 비율 (합계 100%)</label>' +
+              '<div class="grid-4">' +
+              [
+                { k: 'rubric', l: '루브릭(%)' },
+                { k: 'artifact', l: '산출물(%)' },
+                { k: 'peerSelf', l: '자기·동료(%)' },
+                { k: 'attitude', l: '태도(%)' },
+              ]
+                .map(function (w) {
+                  return '<div><span style="font-size:11px;color:var(--text-muted);">' + w.l + '</span><input type="number" class="input mono" data-act-weight="' + w.k + '" value="' + escapeHtml(draftAct.weights[w.k]) + '" /></div>';
+                })
+                .join('') +
+              '</div></div>' +
+              '<div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">루브릭 평가 기준 (' + draftAct.rubricCriteria.length + '개)</label>' +
+              '<div style="display:flex;flex-direction:column;gap:8px;">' +
+              draftAct.rubricCriteria
+                .map(function (rc, idx) {
+                  return '<div style="display:flex;gap:8px;align-items:center;"><input type="text" class="input" data-act-rubric-title="' + idx + '" value="' + escapeHtml(rc.title) + '" /><input type="number" class="input mono" style="width:84px;" data-act-rubric-weight="' + idx + '" value="' + escapeHtml(rc.weight) + '" /></div>';
+                })
+                .join('') +
+              '</div></div>' +
+              '</div>' +
+              '<div class="modal-footer">' +
+              (editing ? '<button type="button" class="btn btn-danger" data-action="delete-activity">활동 삭제</button>' : '<span></span>') +
+              '<div style="display:flex;gap:8px;"><button type="button" class="btn" data-action="close-modal">취소</button><button type="button" class="btn btn-primary" data-action="save-activity">저장하기</button></div>' +
+              '</div></div></div>';
+          }
+
+          // Peer/Self Import Modal
+          if (state.modal === 'peerImport' && activeActivity) {
+            html +=
+              '<div class="backdrop" data-action="close-modal-backdrop">' +
+              '<div class="modal">' +
+              '<div class="modal-header"><strong>자기평가·동료평가 일괄 가져오기</strong><button type="button" class="btn-icon" data-action="close-modal">' + icon('x', 15) + '</button></div>' +
+              '<div class="modal-body">' +
+              '<p style="font-size:12.5px;color:var(--text-muted);margin:0;">구글 설문지나 스프레드시트에서 복사한 데이터를 <strong>학번, 자기점수, 자기성찰, 동료점수, 동료코멘트</strong> 순서로 한 줄에 한 명씩 붙여넣으세요.</p>' +
+              '<textarea class="textarea mono" rows="8" id="peerImportTextarea" placeholder="20301, 90, 모델 비교 과정을 스스로 정리했습니다., 92, 팀원 설명을 잘 도와주었습니다.&#10;20302, 88, 혼동행렬 해석을 연습했습니다., 90, 자료 정리가 꼼꼼합니다."></textarea>' +
+              '</div>' +
+              '<div class="modal-footer"><span></span><div style="display:flex;gap:8px;"><button type="button" class="btn" data-action="close-modal">취소</button><button type="button" class="btn btn-primary" data-action="apply-peer-import">일괄 반영하기</button></div></div>' +
+              '</div></div>';
+          }
+
+          // Evaluation Slide-Over Drawer
+          if (state.activeEvalStudentId && activeActivity) {
+            var idx = classStudents.findIndex(function (s) { return s.id === state.activeEvalStudentId; });
+            var st = idx >= 0 ? classStudents[idx] : null;
+            if (st) {
+              var ev = getEvaluation(activeActivity.id, st.id) || createEmptyEvaluation(activeActivity.classId, activeActivity.id, st.id);
+              html +=
+                '<div class="backdrop drawer-backdrop" data-action="close-drawer-backdrop">' +
+                '<div class="drawer">' +
+                '<div class="modal-header">' +
+                '<div><div class="mono" style="font-size:11px;color:var(--text-muted);">' + escapeHtml(st.studentNumber) + ' · ' + escapeHtml(st.groupName || '모둠 미지정') + '</div><strong style="font-size:16px;">' + escapeHtml(st.name) + ' 통합 평가 입력</strong></div>' +
+                '<div style="display:flex;gap:6px;align-items:center;">' +
+                '<button type="button" class="btn" style="padding:5px 9px;" data-action="drawer-prev" ' + (idx <= 0 ? 'disabled' : '') + '>이전</button>' +
+                '<button type="button" class="btn" style="padding:5px 9px;" data-action="drawer-next" ' + (idx >= classStudents.length - 1 ? 'disabled' : '') + '>다음</button>' +
+                '<button type="button" class="btn-icon" data-action="close-drawer">' + icon('x', 15) + '</button>' +
+                '</div></div>' +
+                '<div class="modal-body">' +
+                '<div class="rubric-card">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="font-size:13px;">학생 기본 정보 수정</strong><button type="button" class="btn btn-primary" style="padding:4px 10px;" data-action="drawer-save-student">정보 저장</button></div>' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
+                '<input type="text" class="input mono" id="drStuNum" value="' + escapeHtml(st.studentNumber) + '" placeholder="학번" />' +
+                '<input type="text" class="input" id="drStuName" value="' + escapeHtml(st.name) + '" placeholder="이름" />' +
+                '<input type="text" class="input" id="drStuGroup" value="' + escapeHtml(st.groupName || '') + '" placeholder="모둠" />' +
+                '</div></div>' +
+                '<div style="display:flex;flex-direction:column;gap:10px;">' +
+                '<strong style="font-size:13px;">1. 루브릭 수행평가</strong>' +
+                activeActivity.rubricCriteria
+                  .map(function (c) {
+                    var cur = ev.rubricScores[c.id];
+                    return (
+                      '<div class="rubric-card">' +
+                      '<div style="display:flex;justify-content:space-between;font-size:12.5px;"><strong>' + escapeHtml(c.title) + '</strong><span class="mono" style="color:var(--text-muted);">비중 ' + c.weight + '%</span></div>' +
+                      '<div class="level-grid">' +
+                      ['excellent', 'good', 'fair', 'needsWork']
+                        .map(function (lvl) {
+                          return (
+                            '<button type="button" class="level-btn ' + (cur === lvl ? 'active' : '') + '" data-action="drawer-set-rubric" data-cid="' + escapeHtml(c.id) + '" data-lvl="' + lvl + '">' +
+                            LEVEL_LABELS[lvl] +
+                            '</button>'
+                          );
+                        })
+                        .join('') +
+                      '</div>' +
+                      (cur ? '<div style="font-size:12px;color:var(--text-secondary);">' + escapeHtml(c.levels[cur]) + '</div>' : '') +
+                      '</div>'
+                    );
+                  })
+                  .join('') +
+                '</div>' +
+                '<div class="rubric-card"><strong style="font-size:13px;">2. 관찰 체크리스트</strong>' +
+                activeActivity.checklistItems
+                  .map(function (item) {
+                    var checked = ev.checklistChecked.indexOf(item) !== -1;
+                    return (
+                      '<label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;cursor:pointer;">' +
+                      '<input type="checkbox" data-action="drawer-toggle-check" data-item="' + escapeHtml(item) + '"' + (checked ? ' checked' : '') + ' />' +
+                      '<span>' + escapeHtml(item) + '</span></label>'
+                    );
+                  })
+                  .join('') +
+                '</div>' +
+                '<div class="rubric-card"><strong style="font-size:13px;">3. 실습 산출물 평가</strong>' +
+                '<div style="display:flex;align-items:center;gap:10px;"><label style="font-size:12px;color:var(--text-muted);">산출물 점수(0~100)</label><input type="number" min="0" max="100" class="input mono" style="width:90px;" id="drArtScore" value="' + escapeHtml(ev.artifact.score) + '" /></div>' +
+                '<input type="text" class="input" id="drArtSummary" placeholder="산출물 핵심 내용 요약" value="' + escapeHtml(ev.artifact.summary) + '" />' +
+                '<input type="text" class="input" id="drArtFeedback" placeholder="교사 산출물 코멘트" value="' + escapeHtml(ev.artifact.feedback) + '" />' +
+                '</div>' +
+                '<div class="rubric-card"><strong style="font-size:13px;">4. 자기평가 · 동료평가</strong>' +
+                '<div class="grid-2">' +
+                '<div><label style="font-size:12px;color:var(--text-muted);">자기평가 점수</label><input type="number" min="0" max="100" class="input mono" id="drSelfScore" value="' + escapeHtml(ev.peerSelf.selfScore) + '" /></div>' +
+                '<div><label style="font-size:12px;color:var(--text-muted);">동료평가 점수</label><input type="number" min="0" max="100" class="input mono" id="drPeerScore" value="' + escapeHtml(ev.peerSelf.peerScore) + '" /></div>' +
+                '</div>' +
+                '<input type="text" class="input" id="drSelfNote" placeholder="자기 성찰 내용" value="' + escapeHtml(ev.peerSelf.selfNote) + '" />' +
+                '<input type="text" class="input" id="drPeerNote" placeholder="동료 평가 코멘트" value="' + escapeHtml(ev.peerSelf.peerNote) + '" />' +
+                '</div>' +
+                '<div class="rubric-card"><strong style="font-size:13px;">5. 수업 태도 및 교사 관찰 메모</strong>' +
+                '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:12px;color:var(--text-muted);">태도 점수</span><input type="number" min="0" max="100" class="input mono" style="width:84px;" id="drAttScore" value="' + escapeHtml(ev.attitudeScore) + '" />' +
+                ATTITUDE_ACTIONS.map(function (a) {
+                  return '<button type="button" class="att-btn" data-action="quick-att" data-id="' + escapeHtml(st.id) + '" data-type="' + escapeHtml(a.type) + '">' + (a.delta > 0 ? '+' : '') + a.delta + ' ' + escapeHtml(a.label) + '</button>';
+                }).join('') +
+                '</div>' +
+                '<textarea class="textarea" rows="3" id="drObsMemo" placeholder="수업 중 관찰한 학생의 질문, 탐구 과정, 성장 포인트 메모">' + escapeHtml(ev.observationMemo) + '</textarea>' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '<div class="mono" style="font-size:13px;">종합 환산 점수: <strong style="color:var(--primary);">' + ev.totalScore + '점</strong></div>' +
+                '<div style="display:flex;gap:8px;">' +
+                '<button type="button" class="btn" data-action="drawer-save-all">저장</button>' +
+                '<button type="button" class="btn btn-primary" data-action="drawer-save-and-ai">' + icon('sparkles', 13) + ' 저장 후 AI 세특</button>' +
+                '</div></div></div></div>';
+            }
+          }
+
+          return html;
+        }
+
+        function render() {
+          document.documentElement.classList.toggle('dark', state.darkMode);
+          syncSelectedClassAndActivity();
+
+          var activeClass = getActiveClass();
+          var classStudents = getClassStudents();
+          var classActivities = getClassActivities();
+          var activeActivity = getActiveActivity();
+
+          var mainBody = '';
+
+          if (state.banner) {
+            mainBody +=
+              '<div class="banner ' +
+              (state.banner.type === 'error' ? 'banner-error' : 'banner-ok') +
+              '"><span>' +
+              escapeHtml(state.banner.text) +
+              '</span><button type="button" class="btn" style="padding:3px 9px;" data-action="close-banner">닫기</button></div>';
+          }
+
+          if (!activeClass) {
+            mainBody +=
+              '<div class="card empty-card">' +
+              '<div class="empty-icon">' + icon('book', 24) + '</div>' +
+              '<h1 style="margin:0 0 10px;font-size:21px;">&lt;인공지능 기초&gt; 첫 수업 평가 공간을 준비해 보세요</h1>' +
+              '<p style="margin:0 0 22px;color:var(--text-secondary);font-size:14px;">학급과 학생 명단을 직접 등록하거나, 2학년 3반 샘플 데이터를 불러와 루브릭·산출물·태도 평가와 세특 초안 작성을 바로 시작할 수 있습니다. 별도 서버나 빌드 없이 단일 index.html로 동작합니다.</p>' +
+              '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">' +
+              '<button type="button" class="btn btn-primary" style="padding:10px 18px;font-size:13.5px;" data-action="seed-sample">' + icon('sparkles', 15) + ' 샘플 학급(2학년 3반) 불러오기</button>' +
+              '<button type="button" class="btn" style="padding:10px 18px;font-size:13.5px;" data-action="open-class-modal">' + icon('plus', 15) + ' 직접 학급·명단 등록하기</button>' +
+              '</div></div>';
+          } else if (!activeActivity) {
+            mainBody +=
+              '<div class="card empty-card">' +
+              '<div class="empty-icon">' + icon('book', 24) + '</div>' +
+              '<p class="mono" style="margin:0 0 6px;font-size:12px;color:var(--text-muted);">' + escapeHtml(activeClass.name) + ' · 등록 학생 ' + classStudents.length + '명</p>' +
+              '<h1 style="margin:0 0 10px;font-size:21px;">' + escapeHtml(activeClass.name) + '의 첫 평가 활동을 만들어 보세요</h1>' +
+              '<p style="margin:0 0 22px;color:var(--text-secondary);font-size:14px;">교육과정 대단원을 선택하면 성취기준과 추천 루브릭이 자동으로 구성됩니다.</p>' +
+              '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">' +
+              '<button type="button" class="btn btn-primary" style="padding:10px 18px;font-size:13.5px;" data-action="open-new-activity">' + icon('plus', 15) + ' 새 평가 활동 만들기</button>' +
+              '<button type="button" class="btn" style="padding:10px 18px;font-size:13.5px;" data-action="open-class-modal">' + icon('users', 15) + ' 학생 명단 관리 (' + classStudents.length + '명)</button>' +
+              '</div></div>';
+          } else {
+            mainBody +=
+              '<div class="card context-header">' +
+              '<div>' +
+              '<div class="context-meta"><span>' + escapeHtml(activeClass.name) + '</span><span>·</span><span>영역 ' + escapeHtml(activeActivity.domainCode) + '. ' + escapeHtml(activeActivity.domainTitle) + '</span><span>·</span><span class="mono">' + escapeHtml(activeActivity.standards.join(', ')) + '</span></div>' +
+              '<h1 class="context-title">' + escapeHtml(activeActivity.title) + '</h1>' +
+              '<div class="mono" style="font-size:12px;color:var(--text-muted);">반영 비율: 루브릭 ' + activeActivity.weights.rubric + '% · 산출물 ' + activeActivity.weights.artifact + '% · 자기/동료 ' + activeActivity.weights.peerSelf + '% · 태도 ' + activeActivity.weights.attitude + '%</div>' +
+              '</div>' +
+              '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+              '<button type="button" class="btn" data-action="open-peer-import">' + icon('upload', 13) + ' 자기·동료평가 가져오기</button>' +
+              '<button type="button" class="btn" data-action="edit-current-activity">루브릭 설정</button>' +
+              '<button type="button" class="btn" data-action="export-csv">' + icon('download', 13) + ' CSV 내보내기</button>' +
+              '</div></div>';
+
+            if (state.activeView === 'eval') {
+              mainBody += renderEvalTable(activeClass, activeActivity, classStudents);
+            } else if (state.activeView === 'ai') {
+              mainBody += renderAiStudio(activeActivity, classStudents);
+            } else if (state.activeView === 'analytics') {
+              mainBody += renderAnalytics(activeActivity, classStudents);
+            }
+          }
+
+          var appEl = document.getElementById('app');
+          appEl.innerHTML =
+            '<div class="app-shell">' +
+            renderTopBar(activeClass) +
+            '<div class="workspace">' +
+            renderSidebar(activeClass, classActivities) +
+            '<main class="main-content">' +
+            mainBody +
+            '</main></div>' +
+            renderModals(activeClass, classStudents, activeActivity) +
+            '</div>';
+        }
+
+        function saveDrawerInputs() {
+          var act = getActiveActivity();
+          if (!act || !state.activeEvalStudentId) return null;
+          var cur = getEvaluation(act.id, state.activeEvalStudentId) || createEmptyEvaluation(act.classId, act.id, state.activeEvalStudentId);
+          var artScore = document.getElementById('drArtScore');
+          var artSum = document.getElementById('drArtSummary');
+          var artFb = document.getElementById('drArtFeedback');
+          var selfScore = document.getElementById('drSelfScore');
+          var peerScore = document.getElementById('drPeerScore');
+          var selfNote = document.getElementById('drSelfNote');
+          var peerNote = document.getElementById('drPeerNote');
+          var attScore = document.getElementById('drAttScore');
+          var obsMemo = document.getElementById('drObsMemo');
+
+          return setEvaluation(act, state.activeEvalStudentId, {
+            artifact: {
+              score: artScore ? clampScore(artScore.value) : cur.artifact.score,
+              summary: artSum ? artSum.value.trim() : cur.artifact.summary,
+              feedback: artFb ? artFb.value.trim() : cur.artifact.feedback,
+            },
+            peerSelf: {
+              selfScore: selfScore ? clampScore(selfScore.value) : cur.peerSelf.selfScore,
+              selfNote: selfNote ? selfNote.value.trim() : cur.peerSelf.selfNote,
+              peerScore: peerScore ? clampScore(peerScore.value) : cur.peerSelf.peerScore,
+              peerNote: peerNote ? peerNote.value.trim() : cur.peerSelf.peerNote,
+            },
+            attitudeScore: attScore ? clampScore(attScore.value) : cur.attitudeScore,
+            observationMemo: obsMemo ? obsMemo.value.trim() : cur.observationMemo,
+          });
+        }
+
+        // Event Delegation
+        document.addEventListener('click', function (e) {
+          var target = e.target.closest('[data-action]');
+          if (!target) return;
+          var action = target.getAttribute('data-action');
+
+          if (action === 'close-modal-backdrop' && e.target !== target) return;
+          if (action === 'close-drawer-backdrop' && e.target !== target) return;
+
+          var act = getActiveActivity();
+          var cls = getActiveClass();
+
+          switch (action) {
+            case 'nav-eval':
+              e.preventDefault();
+              state.activeView = 'eval';
+              render();
+              break;
+            case 'nav':
+              state.activeView = target.getAttribute('data-view');
+              if (state.activeView === 'ai' && act) {
+                var stList = getClassStudents();
+                var curSt = stList.find(function (s) { return s.id === state.aiTargetStudentId; }) || stList[0];
+                if (curSt) {
+                  state.aiTargetStudentId = curSt.id;
+                  var curEv = getEvaluation(act.id, curSt.id);
+                  state.aiDraftText = curEv ? (state.aiMode === 'seteuk' ? curEv.aiSeTeukDraft : curEv.aiFeedbackDraft) : '';
+                }
+              }
+              render();
+              break;
+            case 'toggle-theme':
+              state.darkMode = !state.darkMode;
+              saveStateToStorage();
+              render();
+              break;
+            case 'download-html':
+              exportSingleHtml();
+              break;
+            case 'download-zip':
+              exportGithubZip();
+              break;
+            case 'export-json':
+              exportJsonBackup();
+              break;
+            case 'export-csv':
+              exportCsv();
+              break;
+            case 'close-banner':
+              state.banner = null;
+              render();
+              break;
+            case 'seed-sample':
+              seedSampleClassroom();
+              render();
+              break;
+            case 'open-class-modal':
+              state.modal = 'class';
+              state.classModalEditStudentId = null;
+              render();
+              break;
+            case 'open-new-activity':
+              state.editingActivityId = null;
+              state._activityDraft = null;
+              state.modal = 'activity';
+              render();
+              break;
+            case 'edit-current-activity':
+              if (act) {
+                state.editingActivityId = act.id;
+                state._activityDraft = null;
+                state.modal = 'activity';
+                render();
+              }
+              break;
+            case 'open-peer-import':
+              state.modal = 'peerImport';
+              render();
+              break;
+            case 'close-modal':
+            case 'close-modal-backdrop':
+              state.modal = null;
+              state._activityDraft = null;
+              render();
+              break;
+            case 'select-activity':
+              state.selectedActivityId = target.getAttribute('data-id');
+              state.inlineEditStudentId = null;
+              saveStateToStorage();
+              render();
+              break;
+            case 'set-group-filter':
+              state.groupFilter = target.getAttribute('data-group');
+              render();
+              break;
+            case 'create-class': {
+              var cName = (document.getElementById('newClassName').value || '').trim();
+              var cSem = (document.getElementById('newClassSemester').value || '2026-1학기').trim();
+              if (!cName) {
+                setBanner('error', '학급명을 입력해 주세요.');
+                render();
+                return;
+              }
+              var nc = { id: uid('cls'), name: cName, semester: cSem, subject: '인공지능 기초' };
+              state.classes.push(nc);
+              state.selectedClassId = nc.id;
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'delete-class':
+              if (!cls) return;
+              state.classes = state.classes.filter(function (c) { return c.id !== cls.id; });
+              state.students = state.students.filter(function (s) { return s.classId !== cls.id; });
+              state.activities = state.activities.filter(function (a) { return a.classId !== cls.id; });
+              Object.keys(state.evaluations).forEach(function (k) {
+                if (state.evaluations[k].classId === cls.id) delete state.evaluations[k];
+              });
+              syncSelectedClassAndActivity();
+              saveStateToStorage();
+              render();
+              break;
+            case 'add-student': {
+              if (!cls) return;
+              var num = (document.getElementById('addStuNum').value || '').trim();
+              var nm = (document.getElementById('addStuName').value || '').trim();
+              var grp = (document.getElementById('addStuGroup').value || '').trim();
+              if (!num || !nm) {
+                setBanner('error', '학번과 이름을 모두 입력해 주세요.');
+                render();
+                return;
+              }
+              state.students.push({ id: uid('stu'), classId: cls.id, studentNumber: num, name: nm, groupName: grp });
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'bulk-add-students': {
+              if (!cls) return;
+              var raw = document.getElementById('bulkStuText').value || '';
+              var lines = raw.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+              var added = 0;
+              lines.forEach(function (line) {
+                var cols = line.split(/[,\t]+/).map(function (c) { return c.trim(); });
+                if (cols[0] && cols[1]) {
+                  state.students.push({ id: uid('stu'), classId: cls.id, studentNumber: cols[0], name: cols[1], groupName: cols[2] || '' });
+                  added++;
+                }
+              });
+              if (added > 0) setBanner('ok', added + '명의 학생을 등록했습니다.');
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'cm-edit-student':
+              state.classModalEditStudentId = target.getAttribute('data-id');
+              render();
+              break;
+            case 'cm-cancel-student':
+              state.classModalEditStudentId = null;
+              render();
+              break;
+            case 'cm-save-student': {
+              var sid = target.getAttribute('data-id');
+              var sNum = (document.getElementById('cmNum').value || '').trim();
+              var sName = (document.getElementById('cmName').value || '').trim();
+              var sGrp = (document.getElementById('cmGroup').value || '').trim();
+              if (!sNum || !sName) {
+                setBanner('error', '학번과 이름은 비워둘 수 없습니다.');
+                render();
+                return;
+              }
+              state.students = state.students.map(function (s) {
+                return s.id === sid ? Object.assign({}, s, { studentNumber: sNum, name: sName, groupName: sGrp }) : s;
+              });
+              state.classModalEditStudentId = null;
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'cm-delete-student': {
+              var delId = target.getAttribute('data-id');
+              state.students = state.students.filter(function (s) { return s.id !== delId; });
+              Object.keys(state.evaluations).forEach(function (k) {
+                if (state.evaluations[k].studentId === delId) delete state.evaluations[k];
+              });
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'save-activity': {
+              if (!cls || !state._activityDraft) return;
+              var d = state._activityDraft;
+              d.title = (document.getElementById('actTitleInput').value || '').trim() || d.title;
+              d.activityDate = document.getElementById('actDateInput').value || d.activityDate;
+              var wSum = Number(d.weights.rubric) + Number(d.weights.artifact) + Number(d.weights.peerSelf) + Number(d.weights.attitude);
+              if (wSum !== 100) {
+                setBanner('error', '평가 영역별 반영 비율의 합계는 100%여야 합니다. (현재 ' + wSum + '%)');
+                render();
+                return;
+              }
+              var dom = CURRICULUM_DOMAINS.find(function (x) { return x.code === d.domainCode; }) || CURRICULUM_DOMAINS[0];
+              if (state.editingActivityId) {
+                state.activities = state.activities.map(function (a) {
+                  return a.id === state.editingActivityId
+                    ? Object.assign({}, a, {
+                        title: d.title,
+                        domainCode: dom.code,
+                        domainTitle: dom.title,
+                        standards: d.standards,
+                        activityDate: d.activityDate,
+                        weights: d.weights,
+                        rubricCriteria: d.rubricCriteria,
+                        checklistItems: d.checklistItems,
+                      })
+                    : a;
+                });
+              } else {
+                var newAct = {
+                  id: uid('act'),
+                  classId: cls.id,
+                  title: d.title,
+                  domainCode: dom.code,
+                  domainTitle: dom.title,
+                  standards: d.standards,
+                  activityDate: d.activityDate,
+                  weights: d.weights,
+                  rubricCriteria: d.rubricCriteria,
+                  checklistItems: d.checklistItems,
+                };
+                state.activities.push(newAct);
+                state.selectedActivityId = newAct.id;
+              }
+              state.modal = null;
+              state._activityDraft = null;
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'delete-activity':
+              if (!state.editingActivityId) return;
+              state.activities = state.activities.filter(function (a) { return a.id !== state.editingActivityId; });
+              Object.keys(state.evaluations).forEach(function (k) {
+                if (state.evaluations[k].activityId === state.editingActivityId) delete state.evaluations[k];
+              });
+              state.modal = null;
+              state._activityDraft = null;
+              syncSelectedClassAndActivity();
+              saveStateToStorage();
+              render();
+              break;
+            case 'apply-peer-import': {
+              if (!act) return;
+              var pText = document.getElementById('peerImportTextarea').value || '';
+              var pLines = pText.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+              var cStudents = getClassStudents();
+              var matched = 0;
+              pLines.forEach(function (line) {
+                var cols = line.split(/[,\t]+/).map(function (c) { return c.trim(); });
+                var st = cStudents.find(function (s) { return s.studentNumber === cols[0] || s.name === cols[0]; });
+                if (st) {
+                  var cur = getEvaluation(act.id, st.id) || createEmptyEvaluation(act.classId, act.id, st.id);
+                  setEvaluation(act, st.id, {
+                    peerSelf: {
+                      selfScore: cols[1] !== undefined ? clampScore(cols[1]) : cur.peerSelf.selfScore,
+                      selfNote: cols[2] !== undefined ? cols[2] : cur.peerSelf.selfNote,
+                      peerScore: cols[3] !== undefined ? clampScore(cols[3]) : cur.peerSelf.peerScore,
+                      peerNote: cols[4] !== undefined ? cols[4] : cur.peerSelf.peerNote,
+                    },
+                  });
+                  matched++;
+                }
+              });
+              state.modal = null;
+              setBanner('ok', matched + '명의 자기·동료평가 데이터를 반영했습니다.');
+              render();
+              break;
+            }
+            case 'start-inline': {
+              if (!act) return;
+              var stId = target.getAttribute('data-id');
+              var st = state.students.find(function (s) { return s.id === stId; });
+              if (!st) return;
+              var ev = getEvaluation(act.id, st.id);
+              state.inlineEditStudentId = st.id;
+              state.inlineDraft = {
+                studentNumber: st.studentNumber,
+                name: st.name,
+                groupName: st.groupName || '',
+                artifactScore: ev ? ev.artifact.score : 0,
+                selfScore: ev ? ev.peerSelf.selfScore : 0,
+                peerScore: ev ? ev.peerSelf.peerScore : 0,
+                attitudeScore: ev ? ev.attitudeScore : 80,
+              };
+              render();
+              break;
+            }
+            case 'cancel-inline':
+              state.inlineEditStudentId = null;
+              state.inlineDraft = null;
+              render();
+              break;
+            case 'save-inline': {
+              if (!act || !state.inlineDraft) return;
+              var sid = target.getAttribute('data-id');
+              var nNum = String(state.inlineDraft.studentNumber || '').trim();
+              var nName = String(state.inlineDraft.name || '').trim();
+              if (!nNum || !nName) {
+                setBanner('error', '학번과 이름은 비워둘 수 없습니다.');
+                render();
+                return;
+              }
+              state.students = state.students.map(function (s) {
+                return s.id === sid ? Object.assign({}, s, { studentNumber: nNum, name: nName, groupName: String(state.inlineDraft.groupName || '').trim() }) : s;
+              });
+              var baseEv = getEvaluation(act.id, sid) || createEmptyEvaluation(act.classId, act.id, sid);
+              setEvaluation(act, sid, {
+                artifact: Object.assign({}, baseEv.artifact, { score: clampScore(state.inlineDraft.artifactScore) }),
+                peerSelf: Object.assign({}, baseEv.peerSelf, {
+                  selfScore: clampScore(state.inlineDraft.selfScore),
+                  peerScore: clampScore(state.inlineDraft.peerScore),
+                }),
+                attitudeScore: clampScore(state.inlineDraft.attitudeScore),
+              });
+              state.inlineEditStudentId = null;
+              state.inlineDraft = null;
+              saveStateToStorage();
+              render();
+              break;
+            }
+            case 'quick-att': {
+              if (!act) return;
+              var qSid = target.getAttribute('data-id');
+              var qType = target.getAttribute('data-type');
+              var actObj = ATTITUDE_ACTIONS.find(function (a) { return a.type === qType; });
+              if (!actObj) return;
+              var curEv = getEvaluation(act.id, qSid) || createEmptyEvaluation(act.classId, act.id, qSid);
+              var nextAtt = clampScore(curEv.attitudeScore + actObj.delta);
+              var logs = (curEv.attitudeLogs || []).concat([{ label: actObj.label, delta: actObj.delta, time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) }]);
+              setEvaluation(act, qSid, { attitudeScore: nextAtt, attitudeLogs: logs });
+              render();
+              break;
+            }
+            case 'open-eval-drawer':
+              state.activeEvalStudentId = target.getAttribute('data-id');
+              render();
+              break;
+            case 'close-drawer':
+            case 'close-drawer-backdrop':
+              saveDrawerInputs();
+              state.activeEvalStudentId = null;
+              render();
+              break;
+            case 'drawer-prev': {
+              saveDrawerInputs();
+              var list = getClassStudents();
+              var iPrev = list.findIndex(function (s) { return s.id === state.activeEvalStudentId; });
+              if (iPrev > 0) state.activeEvalStudentId = list[iPrev - 1].id;
+              render();
+              break;
+            }
+            case 'drawer-next': {
+              saveDrawerInputs();
+              var listN = getClassStudents();
+              var iNext = listN.findIndex(function (s) { return s.id === state.activeEvalStudentId; });
+              if (iNext >= 0 && iNext < listN.length - 1) state.activeEvalStudentId = listN[iNext + 1].id;
+              render();
+              break;
+            }
+            case 'drawer-save-student': {
+              var drNum = (document.getElementById('drStuNum').value || '').trim();
+              var drName = (document.getElementById('drStuName').value || '').trim();
+              var drGroup = (document.getElementById('drStuGroup').value || '').trim();
+              if (!drNum || !drName) {
+                setBanner('error', '학번과 이름은 비워둘 수 없습니다.');
+                render();
+                return;
+              }
+              state.students = state.students.map(function (s) {
+                return s.id === state.activeEvalStudentId ? Object.assign({}, s, { studentNumber: drNum, name: drName, groupName: drGroup }) : s;
+              });
+              saveStateToStorage();
+              setBanner('ok', '학생 기본 정보를 저장했습니다.');
+              render();
+              break;
+            }
+            case 'drawer-set-rubric': {
+              if (!act || !state.activeEvalStudentId) return;
+              saveDrawerInputs();
+              var cid = target.getAttribute('data-cid');
+              var lvl = target.getAttribute('data-lvl');
+              var curE = getEvaluation(act.id, state.activeEvalStudentId) || createEmptyEvaluation(act.classId, act.id, state.activeEvalStudentId);
+              var nextRubric = Object.assign({}, curE.rubricScores);
+              nextRubric[cid] = lvl;
+              setEvaluation(act, state.activeEvalStudentId, { rubricScores: nextRubric });
+              render();
+              break;
+            }
+            case 'drawer-save-all':
+              saveDrawerInputs();
+              setBanner('ok', '평가 내용을 저장했습니다.');
+              render();
+              break;
+            case 'drawer-save-and-ai': {
+              var saved = saveDrawerInputs();
+              var sTargetId = state.activeEvalStudentId;
+              state.activeEvalStudentId = null;
+              state.aiTargetStudentId = sTargetId;
+              state.activeView = 'ai';
+              state.aiDraftText = saved ? (state.aiMode === 'seteuk' ? saved.aiSeTeukDraft : saved.aiFeedbackDraft) : '';
+              render();
+              break;
+            }
+            case 'go-ai': {
+              var gId = target.getAttribute('data-id');
+              state.aiTargetStudentId = gId;
+              state.activeView = 'ai';
+              if (act) {
+                var gEv = getEvaluation(act.id, gId);
+                state.aiDraftText = gEv ? (state.aiMode === 'seteuk' ? gEv.aiSeTeukDraft : gEv.aiFeedbackDraft) : '';
+              }
+              render();
+              break;
+            }
+            case 'select-ai-student': {
+              var aId = target.getAttribute('data-id');
+              state.aiTargetStudentId = aId;
+              state.aiEvidenceUsed = [];
+              if (act) {
+                var aEv = getEvaluation(act.id, aId);
+                state.aiDraftText = aEv ? (state.aiMode === 'seteuk' ? aEv.aiSeTeukDraft : aEv.aiFeedbackDraft) : '';
+              }
+              render();
+              break;
+            }
+            case 'set-ai-mode':
+              state.aiMode = target.getAttribute('data-mode');
+              state.aiEvidenceUsed = [];
+              if (act && state.aiTargetStudentId) {
+                var mEv = getEvaluation(act.id, state.aiTargetStudentId);
+                state.aiDraftText = mEv ? (state.aiMode === 'seteuk' ? mEv.aiSeTeukDraft : mEv.aiFeedbackDraft) : '';
+              }
+              render();
+              break;
+            case 'generate-ai-draft': {
+              if (!act) return;
+              var stu = getClassStudents().find(function (s) { return s.id === state.aiTargetStudentId; });
+              if (!stu) return;
+              var evGen = getEvaluation(act.id, stu.id) || createEmptyEvaluation(act.classId, act.id, stu.id);
+              var res = generateEvidenceDraft(stu, act, evGen, state.aiMode, state.aiFocusCompetency, state.aiTargetLength);
+              state.aiDraftText = res.draftText;
+              state.aiEvidenceUsed = res.evidenceUsed;
+              render();
+              break;
+            }
+            case 'batch-ai-seteuk': {
+              if (!act) return;
+              var allSt = getClassStudents();
+              allSt.forEach(function (s) {
+                var e = getEvaluation(act.id, s.id) || createEmptyEvaluation(act.classId, act.id, s.id);
+                var r = generateEvidenceDraft(s, act, e, 'seteuk', state.aiFocusCompetency, state.aiTargetLength);
+                setEvaluation(act, s.id, { aiSeTeukDraft: r.draftText });
+              });
+              var curSel = getEvaluation(act.id, state.aiTargetStudentId);
+              if (state.aiMode === 'seteuk' && curSel) state.aiDraftText = curSel.aiSeTeukDraft;
+              setBanner('ok', allSt.length + '명의 생활기록부 세특 초안을 일괄 생성했습니다.');
+              render();
+              break;
+            }
+            case 'save-ai-draft': {
+              if (!act || !state.aiTargetStudentId) return;
+              var txt = document.getElementById('aiDraftTextarea').value;
+              state.aiDraftText = txt;
+              if (state.aiMode === 'seteuk') setEvaluation(act, state.aiTargetStudentId, { aiSeTeukDraft: txt });
+              else setEvaluation(act, state.aiTargetStudentId, { aiFeedbackDraft: txt });
+              setBanner('ok', '초안을 학생 평가 기록에 저장했습니다.');
+              render();
+              break;
+            }
+            case 'copy-ai-draft': {
+              var copyTxt = document.getElementById('aiDraftTextarea').value;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(copyTxt).then(function () {
+                  setBanner('ok', '클립보드에 복사했습니다.');
+                  render();
+                });
+              }
+              break;
+            }
+          }
+        });
+
+        document.addEventListener('change', function (e) {
+          var el = e.target;
+          var action = el.getAttribute('data-action');
+
+          if (action === 'select-class') {
+            state.selectedClassId = el.value;
+            state.groupFilter = 'all';
+            state.searchQuery = '';
+            state.inlineEditStudentId = null;
+            state.activeEvalStudentId = null;
+            syncSelectedClassAndActivity();
+            saveStateToStorage();
+            render();
+            return;
+          }
+          if (action === 'import-json' && el.files && el.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              try {
+                var parsed = JSON.parse(String(reader.result || '{}'));
+                if (!Array.isArray(parsed.classes)) throw new Error('올바른 백업 파일이 아닙니다.');
+                state.classes = parsed.classes;
+                state.students = Array.isArray(parsed.students) ? parsed.students : [];
+                state.activities = Array.isArray(parsed.activities) ? parsed.activities : [];
+                state.evaluations = parsed.evaluations && typeof parsed.evaluations === 'object' ? parsed.evaluations : {};
+                syncSelectedClassAndActivity();
+                saveStateToStorage();
+                setBanner('ok', 'JSON 백업 데이터를 복원했습니다.');
+              } catch (err) {
+                setBanner('error', err.message || '백업 파일 복원에 실패했습니다.');
+              }
+              render();
+            };
+            reader.readAsText(el.files[0]);
+            return;
+          }
+          if (action === 'act-change-domain' && state._activityDraft) {
+            var dom = CURRICULUM_DOMAINS.find(function (d) { return d.code === el.value; }) || CURRICULUM_DOMAINS[0];
+            state._activityDraft.domainCode = dom.code;
+            state._activityDraft.title = dom.title + ' 탐구 수행평가';
+            state._activityDraft.standards = [dom.standards[0].code];
+            state._activityDraft.rubricCriteria = dom.defaultRubrics.map(function (r, i) {
+              return { id: 'rub_' + i + '_' + Date.now().toString(36), title: r.title, weight: r.weight, levels: r.levels };
+            });
+            state._activityDraft.checklistItems = dom.defaultChecklist.slice();
+            render();
+            return;
+          }
+          if (action === 'act-toggle-std' && state._activityDraft) {
+            var code = el.getAttribute('data-code');
+            var idx = state._activityDraft.standards.indexOf(code);
+            if (el.checked && idx === -1) state._activityDraft.standards.push(code);
+            if (!el.checked && idx !== -1) state._activityDraft.standards.splice(idx, 1);
+            return;
+          }
+          if (action === 'drawer-toggle-check') {
+            var act = getActiveActivity();
+            if (!act || !state.activeEvalStudentId) return;
+            var item = el.getAttribute('data-item');
+            var cur = getEvaluation(act.id, state.activeEvalStudentId) || createEmptyEvaluation(act.classId, act.id, state.activeEvalStudentId);
+            var list = cur.checklistChecked.slice();
+            var i = list.indexOf(item);
+            if (el.checked && i === -1) list.push(item);
+            if (!el.checked && i !== -1) list.splice(i, 1);
+            setEvaluation(act, state.activeEvalStudentId, { checklistChecked: list });
+            return;
+          }
+          if (action === 'set-ai-competency') {
+            state.aiFocusCompetency = el.value;
+            return;
+          }
+          if (action === 'set-ai-length') {
+            state.aiTargetLength = el.value;
+            return;
+          }
+        });
+
+        document.addEventListener('input', function (e) {
+          var el = e.target;
+          if (el.id === 'searchInput') {
+            var pos = el.selectionStart;
+            state.searchQuery = el.value;
+            render();
+            var nextInput = document.getElementById('searchInput');
+            if (nextInput) {
+              nextInput.focus();
+              try { nextInput.setSelectionRange(pos, pos); } catch (err) {}
+            }
+            return;
+          }
+          if (el.id === 'aiDraftTextarea') {
+            state.aiDraftText = el.value;
+            return;
+          }
+          var inlineField = el.getAttribute('data-inline-field');
+          if (inlineField && state.inlineDraft) {
+            state.inlineDraft[inlineField] = el.value;
+            var act = getActiveActivity();
+            var previewEl = document.querySelector('[data-inline-preview-total]');
+            if (act && previewEl && state.inlineEditStudentId) {
+              var ev = getEvaluation(act.id, state.inlineEditStudentId);
+              previewEl.textContent = String(
+                computeTotalScore(act, {
+                  rubricScores: ev ? ev.rubricScores : {},
+                  artifact: { score: clampScore(state.inlineDraft.artifactScore) },
+                  peerSelf: {
+                    selfScore: clampScore(state.inlineDraft.selfScore),
+                    peerScore: clampScore(state.inlineDraft.peerScore),
+                  },
+                  attitudeScore: clampScore(state.inlineDraft.attitudeScore),
+                })
+              );
+            }
+            return;
+          }
+          var wKey = el.getAttribute('data-act-weight');
+          if (wKey && state._activityDraft) {
+            state._activityDraft.weights[wKey] = Number(el.value) || 0;
+            return;
+          }
+          var rtIdx = el.getAttribute('data-act-rubric-title');
+          if (rtIdx !== null && state._activityDraft) {
+            state._activityDraft.rubricCriteria[Number(rtIdx)].title = el.value;
+            return;
+          }
+          var rwIdx = el.getAttribute('data-act-rubric-weight');
+          if (rwIdx !== null && state._activityDraft) {
+            state._activityDraft.rubricCriteria[Number(rwIdx)].weight = Number(el.value) || 0;
+          }
+        });
+
+        loadStateFromStorage();
+        render();
+      })();
+    </script></body></html>
